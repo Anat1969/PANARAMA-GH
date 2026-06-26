@@ -2,7 +2,7 @@ export function UpgradeLink() {
   return (
     <a
       className="upgrade-link neu-raised"
-      href="https://github.com/anat1969/panarama-gh"
+      href="https://claude.ai/code/session_01KhDREyuGNSFuSVGSthsakq"
       target="_blank"
       rel="noopener noreferrer"
     >
