@@ -196,3 +196,223 @@
   0%, 100% { opacity: 0.4; transform: scale(0.9); }
   50% { opacity: 1; transform: scale(1.1); }
 }
+
+/* ============================================================
+   Two-image workflow: upload → prompt → paste → transition
+   ============================================================ */
+.notice {
+  padding: 14px 18px;
+  border-radius: var(--radius-sm);
+  background: var(--c-bg);
+  box-shadow: var(--neu-inset-sm);
+  font-size: 13px;
+  color: var(--c-text);
+  line-height: 1.5;
+}
+.notice code {
+  color: var(--c-accent);
+  font-size: 12px;
+}
+
+.flow {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(28px, 5vh, 52px);
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.step__num {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 22px;
+  color: var(--c-muted);
+  line-height: 1.4;
+}
+.step__body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* ---- Drop zone (upload / drag / paste) ---- */
+.drop {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  border-radius: var(--radius-lg);
+  background: var(--c-bg);
+  background-size: cover;
+  background-position: center;
+  box-shadow: var(--neu-inset-md);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: box-shadow 220ms var(--ease), transform 220ms var(--ease);
+}
+.drop:hover,
+.drop:focus-visible {
+  outline: none;
+  transform: translateY(-1px);
+}
+.drop.is-over {
+  box-shadow: var(--neu-inset-sm), 0 0 0 2px var(--c-accent);
+}
+.drop.has-image {
+  box-shadow: var(--neu-md);
+}
+.drop__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  pointer-events: none;
+}
+.drop__label {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--c-accent);
+}
+.drop__hint {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--c-text-soft);
+}
+.drop__change {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+  background: rgba(239, 242, 249, 0.7);
+  backdrop-filter: blur(6px);
+  box-shadow: var(--neu-sm);
+}
+
+/* ---- Prompt panel ---- */
+.panel {
+  border-radius: var(--radius-lg);
+  padding: 22px 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.panel__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.panel__interpretation {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--c-text);
+}
+.panel__prompt {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--neu-inset-sm);
+}
+.panel__prompt p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--c-accent);
+  word-break: break-word;
+}
+.panel__placeholder {
+  margin: 0;
+  font-size: 14px;
+  color: var(--c-text-soft);
+  line-height: 1.5;
+}
+.panel__error {
+  margin: 0;
+  font-size: 13px;
+  color: #b4632f;
+  line-height: 1.5;
+}
+.panel__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.refine {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.refine__input {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 11px 16px;
+  border: none;
+  border-radius: 999px;
+  background: var(--c-bg);
+  box-shadow: var(--neu-inset-sm);
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--c-text);
+}
+.refine__input:focus {
+  outline: none;
+  box-shadow: var(--neu-inset-sm), 0 0 0 2px var(--c-muted);
+}
+
+.link-btn {
+  background: transparent;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--c-accent);
+  text-transform: uppercase;
+}
+.link-btn:disabled {
+  color: var(--c-muted);
+  cursor: default;
+}
+
+.gen-btn--ghost {
+  box-shadow: none;
+  border: 1px solid rgba(110, 127, 141, 0.25);
+}
+.gen-btn:disabled {
+  color: var(--c-text-soft);
+  cursor: default;
+  box-shadow: var(--neu-inset-sm);
+  transform: none;
+}
+
+/* ---- Save row ---- */
+.save {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.save__msg {
+  font-size: 12px;
+  color: var(--c-text-soft);
+}
+.save__msg.is-error {
+  color: #b4632f;
+}
+
+.stage-footer {
+  margin-top: 4px;
+}

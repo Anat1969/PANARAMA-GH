@@ -1,58 +1,66 @@
-import { useEffect, useRef, useState } from 'react'
-import { GenerateButton } from './components/GenerateButton'
+import { useMemo, useState } from 'react'
+import { ImageDrop } from './components/ImageDrop'
 import { ImageStage } from './components/ImageStage'
+import { PromptPanel } from './components/PromptPanel'
+import { SaveProjectButton } from './components/SaveProjectButton'
 import { TransitionPicker } from './components/TransitionPicker'
-import { buildGeneratedImage, IMAGES, type GalleryImage } from './data/images'
+import { imageFromUrl } from './data/images'
 import { useGallery, type TransitionType } from './hooks/useGallery'
+import { SUPABASE_CONFIGURED } from './lib/config'
+import { generatePrompt, type PromptResult } from './lib/projectApi'
 import './App.css'
 
-export default function App() {
-  const [images, setImages] = useState<GalleryImage[]>(IMAGES)
-  const [isGenerating, setIsGenerating] = useState(false)
-  const g = useGallery(images.length)
+type Slot = { file: File; url: string } | null
 
-  // The picker is the primary control: selecting an effect also plays it.
+export default function App() {
+  const [original, setOriginal] = useState<Slot>(null)
+  const [generated, setGenerated] = useState<Slot>(null)
+  const [result, setResult] = useState<PromptResult | null>(null)
+  const [isBusy, setIsBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const g = useGallery(2)
+
+  const setSlot =
+    (set: (s: Slot) => void, prev: Slot) =>
+    (file: File) => {
+      if (prev) URL.revokeObjectURL(prev.url)
+      set({ file, url: URL.createObjectURL(file) })
+    }
+
+  const run = async (mode: 'create' | 'refine', feedback = '') => {
+    if (!original) return
+    setIsBusy(true)
+    setError(null)
+    try {
+      const res = await generatePrompt(original.file, {
+        mode,
+        previousPrompt: result?.prompt ?? '',
+        feedback,
+      })
+      setResult(res)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setIsBusy(false)
+    }
+  }
+
   const play = (t: TransitionType) => {
     g.setTransition(t)
     g.next()
   }
 
-  // Jump to a freshly appended image once the list has grown.
-  const pendingJump = useRef(false)
-  useEffect(() => {
-    if (pendingJump.current) {
-      pendingJump.current = false
-      g.goTo(images.length - 1)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [images.length])
-
-  // Generate a minimalist living space and add it to the gallery.
-  const generate = () => {
-    if (isGenerating) return
-    setIsGenerating(true)
-    const seed = Math.floor(Math.random() * 1_000_000)
-    const img = buildGeneratedImage(seed, images.length + 1)
-
-    const finish = () => {
-      pendingJump.current = true
-      setImages((prev) => [...prev, img])
-      setIsGenerating(false)
-    }
-
-    // Preload so we transition to a ready image; proceed anyway after a timeout.
-    const pre = new Image()
-    const timer = window.setTimeout(finish, 20000)
-    const done = () => {
-      window.clearTimeout(timer)
-      finish()
-    }
-    pre.onload = done
-    pre.onerror = done
-    pre.src = img.src
-  }
-
-  const current = images[g.index]
+  const pair = useMemo(
+    () =>
+      original && generated
+        ? [
+            imageFromUrl(original.url, 'Your image', 'A', 0),
+            imageFromUrl(generated.url, 'Minimalist space', 'B', 1),
+          ]
+        : null,
+    [original, generated],
+  )
 
   return (
     <div className="page">
@@ -61,34 +69,91 @@ export default function App() {
         <div className="masthead__divider" />
         <div>
           <h1 className="masthead__title">Panarama</h1>
-          <p className="masthead__sub">Image transition states</p>
+          <p className="masthead__sub">Image → prompt → transition</p>
         </div>
       </header>
 
-      <main className="stage-col">
-        <div className="section-label">Transition</div>
-        <TransitionPicker value={g.transition} onSelect={play} />
-
-        <ImageStage
-          images={images}
-          index={g.index}
-          prevIndex={g.prevIndex}
-          direction={g.direction}
-          transition={g.transition}
-          isAnimating={g.isAnimating}
-          onAdvance={g.next}
-        />
-
-        <div className="stage-footer">
-          <div className="stage-meta">
-            <span className="stage-meta__index">
-              {String(g.index + 1).padStart(2, '0')}
-            </span>
-            <span className="stage-meta__title">{current.title}</span>
-          </div>
-
-          <GenerateButton onGenerate={generate} isGenerating={isGenerating} />
+      {!SUPABASE_CONFIGURED && (
+        <div className="notice">
+          Supabase isn’t configured yet — add your publishable key in
+          <code> src/lib/config.ts</code> to enable prompt generation and saving.
         </div>
+      )}
+
+      <main className="flow">
+        {/* Step 1 — upload the reference image */}
+        <section className="step">
+          <span className="step__num">01</span>
+          <div className="step__body">
+            <span className="section-label">Your image</span>
+            <ImageDrop
+              label="Upload a reference image"
+              hint="click · drag · or paste (⌘/Ctrl+V)"
+              previewUrl={original?.url ?? null}
+              onImage={setSlot(setOriginal, original)}
+            />
+          </div>
+        </section>
+
+        {/* Step 2 — generate / refine the Midjourney prompt */}
+        <section className="step">
+          <span className="step__num">02</span>
+          <div className="step__body">
+            <PromptPanel
+              result={result}
+              isBusy={isBusy}
+              error={error}
+              hasImage={!!original}
+              onCreate={() => run('create')}
+              onRefine={(fb) => run('refine', fb)}
+            />
+          </div>
+        </section>
+
+        {/* Step 3 — paste the Midjourney image back */}
+        <section className="step">
+          <span className="step__num">03</span>
+          <div className="step__body">
+            <span className="section-label">Midjourney image</span>
+            <ImageDrop
+              label="Paste the generated image"
+              hint="click · drag · or paste (⌘/Ctrl+V)"
+              previewUrl={generated?.url ?? null}
+              onImage={setSlot(setGenerated, generated)}
+            />
+          </div>
+        </section>
+
+        {/* Step 4 — connect the two images with a transition */}
+        {pair && (
+          <section className="step">
+            <span className="step__num">04</span>
+            <div className="step__body">
+              <span className="section-label">Transition</span>
+              <TransitionPicker value={g.transition} onSelect={play} />
+              <ImageStage
+                images={pair}
+                index={g.index}
+                prevIndex={g.prevIndex}
+                direction={g.direction}
+                transition={g.transition}
+                isAnimating={g.isAnimating}
+                onAdvance={g.next}
+              />
+              <div className="stage-footer">
+                <span className="stage-meta__title">
+                  {g.index === 0 ? 'Your image' : 'Minimalist space'}
+                </span>
+                <SaveProjectButton
+                  original={original?.file ?? null}
+                  generated={generated?.file ?? null}
+                  interpretation={result?.interpretation ?? ''}
+                  prompt={result?.prompt ?? ''}
+                />
+              </div>
+            </div>
+          </section>
+        )}
       </main>
     </div>
   )

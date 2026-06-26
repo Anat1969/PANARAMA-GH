@@ -1,0 +1,59 @@
+import { useState } from 'react'
+import { saveProject } from '../lib/projectApi'
+
+type Props = {
+  original: File | null
+  generated: File | null
+  interpretation: string
+  prompt: string
+}
+
+/** Saves the pair of images + interpretation/prompt to Supabase. */
+export function SaveProjectButton({
+  original,
+  generated,
+  interpretation,
+  prompt,
+}: Props) {
+  const [state, setState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [message, setMessage] = useState('')
+
+  const ready = !!original && !!generated
+  const label =
+    state === 'saving'
+      ? 'Saving…'
+      : state === 'saved'
+        ? 'Saved ✓'
+        : 'Save Project'
+
+  const save = async () => {
+    if (!original || !generated) return
+    setState('saving')
+    setMessage('')
+    try {
+      const res = await saveProject({ original, generated, interpretation, prompt })
+      setState('saved')
+      setMessage(`Saved to Supabase (id ${res.id.slice(0, 8)}…).`)
+    } catch (err) {
+      setState('error')
+      setMessage(String(err instanceof Error ? err.message : err))
+    }
+  }
+
+  return (
+    <div className="save">
+      <button
+        className="gen-btn"
+        onClick={save}
+        disabled={!ready || state === 'saving'}
+      >
+        {label}
+      </button>
+      {message && (
+        <span className={`save__msg ${state === 'error' ? 'is-error' : ''}`}>
+          {message}
+        </span>
+      )}
+    </div>
+  )
+}

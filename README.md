@@ -1,70 +1,73 @@
-# Panarama — Neumorphic Image-Transition Gallery
+# Panarama — Image → Prompt → Transition
 
-A single-page gallery that demonstrates **three image-to-image transition
-states** — **Fade**, **Slide**, and **Zoom** — styled in the soft *neumorphic*
-aesthetic from the "Elements" design board.
+A neumorphic app that turns a reference image into a **minimalist living space**:
+upload an image, let **Claude** interpret it and write a **Midjourney prompt**,
+generate the image in Midjourney, paste it back, and **connect the two images**
+with three transition states — **Fade · Slide · Zoom**. Save the finished pair to
+**Supabase**.
 
-![Fade · Slide · Zoom](https://img.shields.io/badge/transitions-Fade%20%C2%B7%20Slide%20%C2%B7%20Zoom-6E7F8D)
+The visual language is taken from the "Elements" neumorphic style board (soft
+blue-grey palette, diffused inner/outer shadows, thin wide-tracked labels).
 
-## Features
+## The workflow
 
-A deliberately **minimalist, single-column layout** echoing the sparse "Elements"
-inspiration board: a numbered `3 | Panarama` header, thin wide-tracked uppercase
-labels, lots of whitespace, and almost no UI chrome.
+1. **Upload** a reference image (click · drag · or paste with ⌘/Ctrl+V).
+2. **Create Prompt** — Claude (`claude-opus-4-8`, vision) reads the image's palette,
+   mood, light and composition and returns:
+   - an **interpretation** (2–4 sentences explaining the reading), and
+   - a **Midjourney-ready prompt** for a minimalist living space in that mood.
+3. **Refine Prompt** — not happy with it? Add a note ("warmer", "evening light",
+   "more wood") and regenerate a different take.
+4. **Copy** the prompt → generate in Midjourney → **paste** the result back.
+5. **Transition** — pick Fade / Slide / Zoom to connect your image and the
+   generated space; click the image to play it.
+6. **Save Project** — stores both images + the interpretation + prompt in Supabase.
 
-- **3 transition states**, selected with three plain text labels (the only control):
-  - **Fade** — crossfade dissolve
-  - **Slide** — horizontal slide
-  - **Zoom** — scale-and-fade
-- **The picker is the interaction.** Clicking Fade / Slide / Zoom selects that
-  effect *and* plays it by advancing to the next image. Clicking the image itself
-  also advances — so the gallery is navigable with zero visible buttons.
-- **Preset demo gallery** — works out of the box; each image has an on-brand
-  gradient fallback that renders even without network access.
-- **Generate Space** — a button that creates an AI image of a *minimalist living
-  space* inspired by the board, appends it to the gallery, and transitions to it.
-  Runs fully client-side with **no API key** via [Pollinations](https://pollinations.ai)
-  (a fresh seed per click → a new image each time); a gradient placeholder shows
-  while it loads.
-- A thin caption label (`01  Still Water`) under the image, board-style.
-- Fully responsive; respects `prefers-reduced-motion`.
+## Architecture
 
-## Design system
+The site is static (GitHub Pages), so the Claude API key never lives in the browser:
 
-Extracted directly from the attached style board and encoded as CSS custom
-properties in [`src/styles/theme.css`](src/styles/theme.css):
+```
+Browser (React, GitHub Pages)
+   │  image (base64)
+   ▼
+Supabase Edge Function  generate-prompt   ──►  Claude API (claude-opus-4-8, vision)
+   │  { interpretation, prompt }
+   ▼
+Browser  ──►  Supabase Storage (images) + table `projects` (text)
+```
 
-| Token | Value |
-| --- | --- |
-| Background | `#EFF2F9` |
-| Surface | `#E4EBF1` |
-| Muted | `#B5BFC6` |
-| Accent | `#6E7F8D` |
-| Shadow (light) | `#FAFBFF` @ 100% |
-| Shadow (dark) | `#161B1D` @ 23% |
+- **`supabase/functions/generate-prompt/index.ts`** — Deno Edge Function; holds
+  `ANTHROPIC_API_KEY` as a secret, calls Claude with structured output
+  (`output_config.format`), returns `{ interpretation, prompt }`.
+- **`supabase/migrations/0001_projects.sql`** — `projects` table + the
+  `panarama-projects` Storage bucket + anon RLS policies (demo-grade).
+- **`src/lib/`** — `supabase.ts` (client), `config.ts` (URL + publishable key),
+  `projectApi.ts` (`generatePrompt`, `saveProject`).
 
-Neumorphic shadow tiers mirror the board's X&Y / Blur values (5/10, 10/20,
-20/40), with inset variants used for pressed/selected states.
+## Setup
 
-### Fonts
+### 1. Front-end key
+In `src/lib/config.ts`, set `SUPABASE_ANON_KEY` to your project's **publishable /
+anon** key (safe to commit — it's the public client key). The project URL defaults
+to `https://slcpldoaaagkoozpbjsk.supabase.co`. You can also pass
+`VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` at build time.
 
-The original board specifies **Campton** and **Avenir Next**, which are
-commercial licensed fonts. They are substituted with close web equivalents
-loaded from Google Fonts:
+### 2. Provision Supabase (once)
+```bash
+# DB + storage
+supabase db push        # or run supabase/migrations/0001_projects.sql in the SQL editor
 
-- Campton → **Jost** (geometric sans)
-- Avenir Next → **Nunito Sans**
+# Edge Function + secret
+supabase functions deploy generate-prompt --no-verify-jwt
+supabase secrets set ANTHROPIC_API_KEY=sk-ant-...    # your Claude key — never in the client
+```
 
-Swap the `@import`/`<link>` in `index.html` and the `--font-*` tokens in
-`theme.css` if you have licenses for the originals.
-
-## Getting started
-
+### 3. Run
 ```bash
 npm install
-npm run dev      # start the dev server (http://localhost:5173)
+npm run dev      # http://localhost:5173
 npm run build    # type-check + production build
-npm run preview  # preview the production build
 ```
 
 ## Project structure
@@ -72,20 +75,23 @@ npm run preview  # preview the production build
 ```
 src/
   components/
-    ImageStage.tsx      # two stacked layers; applies the active transition
-    TransitionPicker.tsx# 3 plain text labels (Fade / Slide / Zoom)
-    GenerateButton.tsx  # "Generate Space" — keyless AI image (Pollinations)
-  data/images.ts        # preset gallery + gradient fallbacks + generator helper
-  hooks/useGallery.ts   # index / transition / direction state
-  styles/
-    theme.css           # design tokens + neumorphic surfaces
-    transitions.css     # fade / slide / zoom keyframes
-  App.tsx               # minimalist single-column layout
+    ImageDrop.tsx        # upload / drag / paste image input
+    PromptPanel.tsx      # interpretation + prompt, Copy / Create / Refine
+    SaveProjectButton.tsx# save the pair to Supabase
+    ImageStage.tsx       # two stacked layers; plays the active transition
+    TransitionPicker.tsx # Fade / Slide / Zoom
+  lib/
+    config.ts  supabase.ts  projectApi.ts
+  hooks/useGallery.ts    # index / transition / direction state
+  styles/theme.css  transitions.css
+  App.tsx                # the 4-step flow
+supabase/
+  functions/generate-prompt/index.ts
+  migrations/0001_projects.sql
 ```
 
-## How the transitions work
+## Notes
 
-`ImageStage` keeps the current image and (while animating) the previous image as
-two absolutely-positioned layers. On change it sets `data-transition` and
-`data-direction` on the stage; `transitions.css` maps those to the right
-keyframes. Duration is a single token (`--transition-dur`, ~600ms).
+- **Fonts** — the board's Campton / Avenir Next are licensed; substituted with
+  **Jost** / **Nunito Sans** from Google Fonts. Swap in `index.html` + `theme.css`.
+- The demo RLS policies allow anon insert/read — tighten before real multi-user use.

@@ -1,82 +1,30 @@
 export type GalleryImage = {
   id: string
-  /** Remote source (loads when network is available). */
+  /** Image source — an object URL (uploaded/pasted file) or a remote URL. */
   src: string
-  /** CSS gradient fallback so the stage always renders, even offline. */
+  /** CSS gradient fallback shown while the image loads / if it can't be reached. */
   fallback: string
   title: string
   subtitle: string
 }
 
-/**
- * Preset demo gallery. Uses picsum.photos seeded URLs so the set is stable
- * across reloads. Each entry carries a soft, on-brand gradient fallback that
- * shows while the photo loads (or if it can't be reached).
- */
-export const IMAGES: GalleryImage[] = [
-  {
-    id: 'still-water',
-    src: 'https://picsum.photos/seed/panarama-1/1200/800',
-    fallback: 'linear-gradient(135deg, #eff2f9 0%, #b5bfc6 100%)',
-    title: 'Still Water',
-    subtitle: 'No. 01',
-  },
-  {
-    id: 'soft-dunes',
-    src: 'https://picsum.photos/seed/panarama-2/1200/800',
-    fallback: 'linear-gradient(135deg, #e4ebf1 0%, #6e7f8d 100%)',
-    title: 'Soft Dunes',
-    subtitle: 'No. 02',
-  },
-  {
-    id: 'low-tide',
-    src: 'https://picsum.photos/seed/panarama-3/1200/800',
-    fallback: 'linear-gradient(135deg, #b5bfc6 0%, #eff2f9 100%)',
-    title: 'Low Tide',
-    subtitle: 'No. 03',
-  },
-  {
-    id: 'quiet-ridge',
-    src: 'https://picsum.photos/seed/panarama-4/1200/800',
-    fallback: 'linear-gradient(135deg, #6e7f8d 0%, #e4ebf1 100%)',
-    title: 'Quiet Ridge',
-    subtitle: 'No. 04',
-  },
-  {
-    id: 'pale-horizon',
-    src: 'https://picsum.photos/seed/panarama-5/1200/800',
-    fallback: 'linear-gradient(135deg, #eff2f9 0%, #6e7f8d 100%)',
-    title: 'Pale Horizon',
-    subtitle: 'No. 05',
-  },
-]
-
-/** On-brand prompt for the "Generate Space" button (matches the inspiration board). */
-export const MINIMAL_SPACE_PROMPT =
-  'minimalist living space, serene scandinavian interior, soft pale blue-grey ' +
-  'palette, neumorphic diffused soft shadows, airy and calm, natural daylight, ' +
-  'muted tones, clean architectural photography, uncluttered, soft focus'
-
-const GEN_FALLBACKS = [
+const FALLBACKS = [
   'linear-gradient(135deg, #eff2f9 0%, #b5bfc6 100%)',
   'linear-gradient(135deg, #e4ebf1 0%, #6e7f8d 100%)',
-  'linear-gradient(135deg, #b5bfc6 0%, #eff2f9 100%)',
 ]
 
-/**
- * Build a freshly generated gallery image from a keyless Pollinations URL.
- * A new `seed` yields a new image; `n` is the gallery position (for the label).
- */
-export function buildGeneratedImage(seed: number, n: number): GalleryImage {
-  const url =
-    'https://image.pollinations.ai/prompt/' +
-    encodeURIComponent(MINIMAL_SPACE_PROMPT) +
-    `?width=1200&height=800&seed=${seed}&nologo=true&model=flux`
+/** Wrap an image URL as a GalleryImage for the transition stage. */
+export function imageFromUrl(
+  src: string,
+  title: string,
+  subtitle: string,
+  variant = 0,
+): GalleryImage {
   return {
-    id: `generated-${seed}`,
-    src: url,
-    fallback: GEN_FALLBACKS[seed % GEN_FALLBACKS.length],
-    title: 'Generated Space',
-    subtitle: `No. ${String(n).padStart(2, '0')}`,
+    id: `${title}-${src}`,
+    src,
+    fallback: FALLBACKS[variant % FALLBACKS.length],
+    title,
+    subtitle,
   }
 }
