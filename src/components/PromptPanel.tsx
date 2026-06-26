@@ -39,10 +39,10 @@ export function PromptPanel({
   return (
     <section className="panel neu-raised">
       <div className="panel__head">
-        <span className="panel__label">Interpretation</span>
+        <span className="panel__label">פרשנות</span>
         {result && (
           <button className="link-btn" onClick={copy} disabled={!result.prompt}>
-            {copied ? 'Copied ✓' : 'Copy prompt'}
+            {copied ? 'הועתק ✓' : 'העתקת פרומפט'}
           </button>
         )}
       </div>
@@ -52,8 +52,8 @@ export function PromptPanel({
       {!result && !error && (
         <p className="panel__placeholder">
           {hasImage
-            ? 'Click “Create Prompt” to read your image and write a Midjourney prompt.'
-            : 'Upload, drag, or paste an image above to begin.'}
+            ? 'לחצו על "צור פרומפט" כדי לקרוא את התמונה ולכתוב פרומפט ל-Midjourney.'
+            : 'העלו, גררו או הדביקו תמונה למעלה כדי להתחיל.'}
         </p>
       )}
 
@@ -61,8 +61,8 @@ export function PromptPanel({
         <>
           <p className="panel__interpretation">{result.interpretation}</p>
           <div className="panel__prompt">
-            <span className="panel__label">Midjourney prompt</span>
-            <p>{result.prompt}</p>
+            <span className="panel__label">פרומפט ל-Midjourney</span>
+            <p dir="ltr" lang="en">{result.prompt}</p>
           </div>
         </>
       )}
@@ -73,14 +73,14 @@ export function PromptPanel({
           onClick={onCreate}
           disabled={!hasImage || isBusy}
         >
-          {isBusy ? 'Reading image…' : result ? 'Regenerate' : 'Create Prompt'}
+          {isBusy ? 'קורא תמונה…' : result ? 'יצירה מחדש' : 'צור פרומפט'}
         </button>
 
         {result && (
           <div className="refine">
             <input
               className="refine__input"
-              placeholder="Refine: e.g. warmer, more wood, evening light…"
+              placeholder="חידוד: למשל חמים יותר, יותר עץ, אור ערב…"
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
               disabled={isBusy}
@@ -90,7 +90,7 @@ export function PromptPanel({
               onClick={() => onRefine(feedback)}
               disabled={isBusy}
             >
-              Refine Prompt
+              חדד פרומפט
             </button>
           </div>
         )}

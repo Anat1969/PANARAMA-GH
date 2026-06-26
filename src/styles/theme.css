@@ -25,9 +25,9 @@
   --neu-inset-sm: inset 5px 5px 10px var(--sh-dark), inset -5px -5px 10px var(--sh-light);
   --neu-inset-md: inset 10px 10px 20px var(--sh-dark), inset -10px -10px 20px var(--sh-light);
 
-  /* Typography */
-  --font-display: 'Jost', 'Campton', system-ui, sans-serif;   /* Campton substitute */
-  --font-body: 'Nunito Sans', 'Avenir Next', system-ui, sans-serif; /* Avenir Next substitute */
+  /* Typography — Latin via Jost/Nunito Sans, Hebrew via Heebo (fallback chain) */
+  --font-display: 'Jost', 'Heebo', 'Campton', system-ui, sans-serif;
+  --font-body: 'Heebo', 'Nunito Sans', 'Avenir Next', system-ui, sans-serif;
 
   /* Motion */
   --transition-dur: 600ms;

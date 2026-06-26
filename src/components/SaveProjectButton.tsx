@@ -21,10 +21,10 @@ export function SaveProjectButton({
   const ready = !!original && !!generated
   const label =
     state === 'saving'
-      ? 'Saving…'
+      ? 'שומר…'
       : state === 'saved'
-        ? 'Saved ✓'
-        : 'Save Project'
+        ? 'נשמר ✓'
+        : 'שמירת פרויקט'
 
   const save = async () => {
     if (!original || !generated) return
@@ -35,10 +35,10 @@ export function SaveProjectButton({
       setState('saved')
       setMessage(
         res.where === 'supabase'
-          ? `Saved to Supabase (id ${res.id?.slice(0, 8)}…).`
+          ? `נשמר ל-Supabase (מזהה ${res.id?.slice(0, 8)}…).`
           : res.where === 'folder'
-            ? 'Saved to your chosen folder.'
-            : 'Downloaded the project files.',
+            ? 'נשמר לתיקייה שבחרת.'
+            : 'קבצי הפרויקט הורדו.',
       )
     } catch (err) {
       setState('error')

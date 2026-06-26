@@ -73,7 +73,7 @@ export function ImageDrop({ label, hint, previewUrl, onImage }: Props) {
           <span className="drop__hint">{hint}</span>
         </div>
       )}
-      {previewUrl && <span className="drop__change">Replace</span>}
+      {previewUrl && <span className="drop__change">החלפה</span>}
     </div>
   )
 }

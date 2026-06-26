@@ -25,8 +25,9 @@ const OUTPUT_SCHEMA = {
     interpretation: {
       type: 'string',
       description:
-        'Two to four sentences explaining how the uploaded image (its palette, ' +
-        'mood, light and composition) is interpreted as a minimalist living space.',
+        'IN HEBREW: two to four sentences explaining how the uploaded image (its ' +
+        'palette, mood, light and composition) is interpreted as a minimalist ' +
+        'living space.',
     },
     prompt: {
       type: 'string',
@@ -46,12 +47,13 @@ that carries the SAME palette and feeling — soft, airy, neumorphic, with diffu
 natural light and a restrained material palette.
 
 Return:
-- "interpretation": 2-4 sentences, in warm plain language, explaining what you read
-  in the image and how it becomes this living space (name the colours/mood you used).
-- "prompt": ONE Midjourney prompt describing that living space — concrete nouns,
-  materials, light, mood, lens — ending with: --ar 3:2 --style raw --v 6
+- "interpretation": IN HEBREW — 2-4 sentences, warm plain language, explaining what
+  you read in the image and how it becomes this living space (name the colours/mood).
+- "prompt": IN ENGLISH — ONE Midjourney prompt describing that living space —
+  concrete nouns, materials, light, mood, lens — ending with: --ar 3:2 --style raw --v 6
 
-Keep it tasteful and specific. Do not mention the reference image inside "prompt".`
+Keep it tasteful and specific. Do not mention the reference image inside "prompt".
+The interpretation MUST be Hebrew; the prompt MUST be English.`
 
 function refineInstruction(previousPrompt: string, feedback?: string): string {
   return (

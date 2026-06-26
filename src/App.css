@@ -287,7 +287,7 @@
 }
 .drop__change {
   position: absolute;
-  right: 12px;
+  inset-inline-end: 12px;
   bottom: 12px;
   padding: 6px 14px;
   border-radius: 999px;
@@ -415,4 +415,117 @@
 
 .stage-footer {
   margin-top: 4px;
+}
+
+/* ============================================================
+   Mobile mode (phones)
+   ============================================================ */
+@media (max-width: 640px) {
+  .page {
+    padding: 28px 18px 56px;
+    gap: 30px;
+  }
+
+  .masthead {
+    gap: 14px;
+  }
+  .masthead__index {
+    font-size: 30px;
+  }
+  .masthead__divider {
+    height: 34px;
+  }
+
+  .notice {
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+
+  .flow {
+    gap: 30px;
+  }
+
+  /* Tighter step rail */
+  .step {
+    grid-template-columns: 26px 1fr;
+    gap: 12px;
+  }
+  .step__num {
+    font-size: 18px;
+  }
+
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 0.26em;
+  }
+
+  /* Picker: comfortable taps, no overflow */
+  .picker {
+    gap: 22px;
+  }
+  .picker__item {
+    font-size: 19px;
+    padding: 8px 0;
+  }
+
+  /* Prompt panel */
+  .panel {
+    padding: 18px 16px 20px;
+  }
+  .panel__interpretation {
+    font-size: 14px;
+  }
+  .panel__prompt p {
+    font-size: 12.5px;
+  }
+
+  /* Refine + actions stack full width for thumbs */
+  .refine {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .refine__input {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+  .gen-btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 46px;
+  }
+  .gen-btn--ghost {
+    width: 100%;
+  }
+
+  /* Save row stacks under the caption */
+  .stage-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .save {
+    justify-content: stretch;
+  }
+  .save .gen-btn {
+    width: 100%;
+  }
+  .save__msg {
+    text-align: center;
+  }
+
+  /* Drop badge a touch bigger to tap */
+  .drop__change {
+    padding: 8px 16px;
+    font-size: 11px;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 380px) {
+  .picker {
+    gap: 16px;
+  }
+  .picker__item {
+    font-size: 17px;
+  }
 }

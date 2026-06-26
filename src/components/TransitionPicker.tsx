@@ -7,9 +7,9 @@ type Props = {
 }
 
 const OPTIONS: { key: TransitionType; label: string }[] = [
-  { key: 'fade', label: 'Fade' },
-  { key: 'slide', label: 'Slide' },
-  { key: 'zoom', label: 'Zoom' },
+  { key: 'fade', label: 'דהייה' },
+  { key: 'slide', label: 'החלקה' },
+  { key: 'zoom', label: 'זום' },
 ]
 
 /**

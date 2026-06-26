@@ -69,16 +69,15 @@ export default function App() {
         <div className="masthead__divider" />
         <div>
           <h1 className="masthead__title">Panarama</h1>
-          <p className="masthead__sub">Image → prompt → transition</p>
+          <p className="masthead__sub">תמונה · פרומפט · מעבר</p>
         </div>
       </header>
 
       {!SUPABASE_CONFIGURED && (
         <div className="notice">
-          Running in <strong>local mode</strong> — no setup needed. Prompts are built
-          in your browser from the image, and Save Project writes to a folder you pick.
-          Add a Supabase key in <code>src/lib/config.ts</code> to use Claude-written
-          prompts and cloud save.
+          פועל ב<strong>מצב מקומי</strong> — ללא הגדרות. הפרומפט נבנה בדפדפן מתוך
+          התמונה, ו"שמירת פרויקט" שומרת לתיקייה שתבחרו. הוסיפו מפתח Supabase ב־
+          <code>src/lib/config.ts</code> כדי לקבל פרומפט שכתוב על־ידי Claude ושמירה בענן.
         </div>
       )}
 
@@ -87,10 +86,10 @@ export default function App() {
         <section className="step">
           <span className="step__num">01</span>
           <div className="step__body">
-            <span className="section-label">Your image</span>
+            <span className="section-label">התמונה שלך</span>
             <ImageDrop
-              label="Upload a reference image"
-              hint="click · drag · or paste (⌘/Ctrl+V)"
+              label="העלאת תמונת מקור"
+              hint="לחיצה · גרירה · או הדבקה (⌘/Ctrl+V)"
               previewUrl={original?.url ?? null}
               onImage={setSlot(setOriginal, original)}
             />
@@ -116,10 +115,10 @@ export default function App() {
         <section className="step">
           <span className="step__num">03</span>
           <div className="step__body">
-            <span className="section-label">Midjourney image</span>
+            <span className="section-label">תמונת Midjourney</span>
             <ImageDrop
-              label="Paste the generated image"
-              hint="click · drag · or paste (⌘/Ctrl+V)"
+              label="הדבקת התמונה שנוצרה"
+              hint="לחיצה · גרירה · או הדבקה (⌘/Ctrl+V)"
               previewUrl={generated?.url ?? null}
               onImage={setSlot(setGenerated, generated)}
             />
@@ -131,7 +130,7 @@ export default function App() {
           <section className="step">
             <span className="step__num">04</span>
             <div className="step__body">
-              <span className="section-label">Transition</span>
+              <span className="section-label">מעבר</span>
               <TransitionPicker value={g.transition} onSelect={play} />
               <ImageStage
                 images={pair}
@@ -144,7 +143,7 @@ export default function App() {
               />
               <div className="stage-footer">
                 <span className="stage-meta__title">
-                  {g.index === 0 ? 'Your image' : 'Minimalist space'}
+                  {g.index === 0 ? 'התמונה שלך' : 'מרחב מינימליסטי'}
                 </span>
                 <SaveProjectButton
                   original={original?.file ?? null}
