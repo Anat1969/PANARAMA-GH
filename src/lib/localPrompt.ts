@@ -133,6 +133,21 @@ const LENSES = [
   { en: 'biophilic stillness, a few sculptural plants', he: 'שלווה ביופילית, כמה צמחים פסליים' },
 ]
 
+const STRUCTURE_LENSES = [
+  { en: 'geometric volumes and intersecting planes', he: 'נפחים גיאומטריים ומישורים מצטלבים' },
+  { en: 'rhythmic repetition of vertical and horizontal elements', he: 'חזרתיות קצבית של אלמנטים אנכיים ואופקיים' },
+  { en: 'negative space as a primary compositional element', he: 'מרחב שלילי כאלמנט קומפוזיציוני ראשי' },
+  { en: 'monolithic forms with subtle material contrasts', he: 'צורות מונוליתיות עם ניגודי חומר עדינים' },
+  { en: 'layered transparency and translucent partitions', he: 'שכבות שקיפות ומחיצות חצי-שקופות' },
+]
+
+const STRUCTURE_MATERIALS = [
+  { en: 'exposed concrete, white plaster, pale stone', he: 'בטון חשוף, טיח לבן, אבן בהירה' },
+  { en: 'raw timber frame, paper screens, smooth clay', he: 'שלד עץ גולמי, מסכי נייר, חימר חלק' },
+  { en: 'polished terrazzo, glass, brushed steel', he: 'טראצו מלוטש, זכוכית, פלדה מוברשת' },
+  { en: 'rammed earth, linen panels, travertine', he: 'אדמה דחוסה, לוחות פשתן, טרוורטין' },
+]
+
 const LIGHTS = [
   { en: 'soft diffused morning light', he: 'אור בוקר רך ומפוזר' },
   { en: 'overcast even daylight', he: 'אור יום אחיד ומעונן' },
@@ -160,18 +175,57 @@ function moodWords(a: Analysis): { en: string; he: string } {
   }
 }
 
+function buildStructurePrompt(
+  a: Analysis,
+  opts: { feedback?: string },
+): PromptResult {
+  const palette = a.palette.slice(0, 3)
+  const paletteEn = palette.map((p) => p.name.en).join(', ')
+  const paletteHe = palette.map((p) => p.name.he).join(', ')
+  const mood = moodWords(a)
+  const feedback = (opts.feedback ?? '').trim()
+
+  const variant = (feedback.length + palette.length) % STRUCTURE_LENSES.length
+  const structLens = STRUCTURE_LENSES[variant]
+  const material = STRUCTURE_MATERIALS[variant % STRUCTURE_MATERIALS.length]
+  const light = LIGHTS[variant % LIGHTS.length]
+
+  const tempHe = a.temperature === 'warm' ? 'חום טבעי' : a.temperature === 'cool' ? 'קרירות מרוסנת' : 'איזון טונאלי'
+
+  const interpretation =
+    `מהתמונה זוקקנו שפה עיצובית של ${mood.he} עם פלטת ${paletteHe}. ` +
+    `במקום להעתיק — אנחנו מתרגמים את הרוח למבנה מינימליסטי: ` +
+    `${structLens.he}, חומרים של ${material.he}, ` +
+    `ו${tempHe} שמהדהד את האווירה המקורית.`
+
+  const prompt =
+    `minimalist architectural structure, ${structLens.en}, ` +
+    `distilled palette of ${paletteEn}, ${mood.en} mood translated into form, ` +
+    `materials: ${material.en}, ${light.en}, ` +
+    `pure volumes, essential geometry, no decoration, ` +
+    `design language inspired by source image — not copied but reinterpreted` +
+    (feedback ? `, ${feedback}` : '') +
+    `, architectural photography --ar 3:2 --style raw --v 6`
+
+  return { interpretation, prompt }
+}
+
 /** Keyless interpretation (Hebrew) + Midjourney prompt (English), from the image. */
 export async function localPrompt(
   file: File,
   opts: { mode?: GenerateMode; previousPrompt?: string; feedback?: string } = {},
 ): Promise<PromptResult> {
   const a = await loadAnalysis(file)
+
+  if (opts.mode === 'structure') {
+    return buildStructurePrompt(a, { feedback: opts.feedback })
+  }
+
   const palette = a.palette.slice(0, 3)
   const paletteEn = palette.map((p) => p.name.en).join(', ')
   const paletteHe = palette.map((p) => p.name.he).join(', ')
   const mood = moodWords(a)
 
-  // Vary the lens/light each refine (and fold in any feedback).
   const variant =
     opts.mode === 'refine'
       ? ((opts.previousPrompt?.length ?? 0) + (opts.feedback?.length ?? 0) + 1)
@@ -181,14 +235,12 @@ export async function localPrompt(
   const feedback = (opts.feedback ?? '').trim()
   const tempHe = a.temperature === 'warm' ? 'חם ומעוגן' : a.temperature === 'cool' ? 'קריר ושקט' : 'מאוזן וניטרלי'
 
-  // Interpretation — in Hebrew.
   const interpretation =
     `התמונה שלך נקראת ${mood.he}, ובנויה בעיקר מ${paletteHe}. ` +
     `בתרגום למרחב מחיה מינימליסטי, זה הופך לחדר שליו באותה פלטה — ` +
     `משטחים ב${tempHe} תחת ${light.he}, נקי ומרגיע` +
     (opts.mode === 'refine' ? `, בגישת ${lens.he}.` : '.')
 
-  // Midjourney prompt — in English.
   const prompt =
     `minimalist living space interior, ${lens.en}, ` +
     `palette of ${paletteEn}, ${mood.en} atmosphere, ${light.en}, ` +

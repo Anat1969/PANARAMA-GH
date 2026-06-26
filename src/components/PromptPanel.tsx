@@ -7,32 +7,43 @@ type Props = {
   error: string | null
   hasImage: boolean
   onCreate: () => void
+  onStructure: () => void
   onRefine: (feedback: string) => void
 }
 
-/**
- * Shows the Claude interpretation + Midjourney prompt, with Copy / Create /
- * Refine controls. Refine takes optional free-text feedback.
- */
 export function PromptPanel({
   result,
   isBusy,
   error,
   hasImage,
   onCreate,
+  onStructure,
   onRefine,
 }: Props) {
   const [copied, setCopied] = useState(false)
+  const [copiedFull, setCopiedFull] = useState(false)
   const [feedback, setFeedback] = useState('')
 
-  const copy = async () => {
+  const copyPrompt = async () => {
     if (!result?.prompt) return
     try {
       await navigator.clipboard.writeText(result.prompt)
       setCopied(true)
       window.setTimeout(() => setCopied(false), 1600)
     } catch {
-      /* clipboard blocked — ignore */
+      /* clipboard blocked */
+    }
+  }
+
+  const copyFull = async () => {
+    if (!result) return
+    const text = `${result.interpretation}\n\n---\n\n${result.prompt}`
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopiedFull(true)
+      window.setTimeout(() => setCopiedFull(false), 1600)
+    } catch {
+      /* clipboard blocked */
     }
   }
 
@@ -41,9 +52,14 @@ export function PromptPanel({
       <div className="panel__head">
         <span className="panel__label">פרשנות</span>
         {result && (
-          <button className="link-btn" onClick={copy} disabled={!result.prompt}>
-            {copied ? 'הועתק ✓' : 'העתקת פרומפט'}
-          </button>
+          <div className="panel__copy-group">
+            <button className="link-btn" onClick={copyPrompt} disabled={!result.prompt}>
+              {copied ? 'הועתק ✓' : 'העתקת פרומפט'}
+            </button>
+            <button className="link-btn" onClick={copyFull}>
+              {copiedFull ? 'הועתק ✓' : 'העתקת הכל'}
+            </button>
+          </div>
         )}
       </div>
 
@@ -68,13 +84,22 @@ export function PromptPanel({
       )}
 
       <div className="panel__actions">
-        <button
-          className="gen-btn"
-          onClick={onCreate}
-          disabled={!hasImage || isBusy}
-        >
-          {isBusy ? 'קורא תמונה…' : result ? 'יצירה מחדש' : 'צור פרומפט'}
-        </button>
+        <div className="panel__create-row">
+          <button
+            className="gen-btn"
+            onClick={onCreate}
+            disabled={!hasImage || isBusy}
+          >
+            {isBusy ? 'קורא תמונה…' : result ? 'יצירה מחדש' : 'צור פרומפט'}
+          </button>
+          <button
+            className="gen-btn gen-btn--structure"
+            onClick={onStructure}
+            disabled={!hasImage || isBusy}
+          >
+            מבנה מינימליסטי
+          </button>
+        </div>
 
         {result && (
           <div className="refine">

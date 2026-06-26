@@ -31,7 +31,7 @@ export default function App() {
       set({ file, url: URL.createObjectURL(file) })
     }
 
-  const run = async (mode: 'create' | 'refine', feedback = '') => {
+  const run = async (mode: 'create' | 'refine' | 'structure', feedback = '') => {
     if (!original) return
     setIsBusy(true)
     setError(null)
@@ -47,6 +47,15 @@ export default function App() {
     } finally {
       setIsBusy(false)
     }
+  }
+
+  const newProject = () => {
+    if (original) URL.revokeObjectURL(original.url)
+    if (generated) URL.revokeObjectURL(generated.url)
+    setOriginal(null)
+    setGenerated(null)
+    setResult(null)
+    setError(null)
   }
 
   const loadFromLibrary = (payload: {
@@ -90,12 +99,20 @@ export default function App() {
           <h1 className="masthead__title">Panarama</h1>
           <p className="masthead__sub">תמונה · פרומפט · מעבר</p>
         </div>
-        <button
-          className="masthead__library-btn"
-          onClick={() => setShowLibrary(true)}
-        >
-          ספרייה
-        </button>
+        <div className="masthead__actions">
+          <button
+            className="masthead__library-btn"
+            onClick={newProject}
+          >
+            פרויקט חדש
+          </button>
+          <button
+            className="masthead__library-btn"
+            onClick={() => setShowLibrary(true)}
+          >
+            ספרייה
+          </button>
+        </div>
       </header>
 
       {!SUPABASE_CONFIGURED && (
@@ -131,6 +148,7 @@ export default function App() {
               error={error}
               hasImage={!!original}
               onCreate={() => run('create')}
+              onStructure={() => run('structure')}
               onRefine={(fb) => run('refine', fb)}
             />
           </div>

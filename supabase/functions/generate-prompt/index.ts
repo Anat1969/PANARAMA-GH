@@ -69,6 +69,28 @@ function refineInstruction(previousPrompt: string, feedback?: string): string {
   )
 }
 
+const STRUCTURE_SYSTEM_PROMPT = `You distill an uploaded reference image into a MINIMALIST ARCHITECTURAL STRUCTURE.
+
+You are NOT copying the image — you are extracting its design language: the rhythm,
+proportions, tonal relationships, spatial tension, and material feeling. Then you
+TRANSLATE and REINTERPRET those qualities into a pure, minimal architectural form.
+
+Read the reference image carefully: its dominant colours, compositional geometry,
+contrast ratios, directional energy, and textural mood. Then imagine an architectural
+structure — it could be a pavilion, a room, a facade, an interior volume — that
+embodies the SAME design DNA through geometry, material, and light.
+
+Return:
+- "interpretation": IN HEBREW — 2-4 sentences explaining what design language you
+  extracted from the image and how it was reinterpreted as an architectural structure.
+  Use words like "זיקקנו" (distilled), "תרגמנו" (translated), "פירשנו" (interpreted).
+- "prompt": IN ENGLISH — ONE Midjourney prompt describing that minimalist structure —
+  geometric volumes, materials, light, spatial qualities — ending with:
+  --ar 3:2 --style raw --v 6
+
+Be faithful to the original image's essence. You don't copy — you distill, translate,
+and reinterpret. The interpretation MUST be Hebrew; the prompt MUST be English.`
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -101,15 +123,19 @@ Deno.serve(async (req: Request) => {
       return json({ error: 'Missing imageBase64.' }, 400)
     }
 
+    const isStructure = mode === 'structure'
     const userText =
       mode === 'refine' && previousPrompt
         ? refineInstruction(previousPrompt, feedback)
-        : 'Interpret this image as a minimalist living space and write the prompt.'
+        : isStructure
+          ? 'Extract the design language from this image and reinterpret it as a minimalist architectural structure.' +
+            (feedback ? ` Additional direction: ${feedback}` : '')
+          : 'Interpret this image as a minimalist living space and write the prompt.'
 
     const anthropicReq = {
       model: MODEL,
       max_tokens: 1024,
-      system: SYSTEM_PROMPT,
+      system: isStructure ? STRUCTURE_SYSTEM_PROMPT : SYSTEM_PROMPT,
       output_config: {
         format: { type: 'json_schema', schema: OUTPUT_SCHEMA },
       },

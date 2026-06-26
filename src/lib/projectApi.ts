@@ -8,7 +8,7 @@ export type PromptResult = {
   prompt: string
 }
 
-export type GenerateMode = 'create' | 'refine'
+export type GenerateMode = 'create' | 'refine' | 'structure'
 
 /** Read a File into a bare base64 string (no data: prefix) + its media type. */
 export function fileToBase64(

@@ -346,6 +346,20 @@
   color: #b4632f;
   line-height: 1.5;
 }
+.panel__copy-group {
+  display: flex;
+  gap: 12px;
+}
+.panel__create-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.gen-btn--structure {
+  border: 1px solid rgba(110, 127, 141, 0.25);
+  box-shadow: none;
+  font-size: 11px;
+}
 .panel__actions {
   display: flex;
   flex-direction: column;
@@ -533,8 +547,12 @@
 /* ============================================================
    Library button in masthead
    ============================================================ */
-.masthead__library-btn {
+.masthead__actions {
   margin-inline-start: auto;
+  display: flex;
+  gap: 10px;
+}
+.masthead__library-btn {
   padding: 8px 18px;
   border-radius: 999px;
   background: var(--c-bg);
@@ -706,9 +724,23 @@
   .library-grid {
     grid-template-columns: 1fr;
   }
+  .masthead__actions {
+    gap: 8px;
+  }
   .masthead__library-btn {
     padding: 6px 14px;
     font-size: 11px;
+  }
+  .panel__copy-group {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .panel__create-row {
+    flex-direction: column;
+  }
+  .gen-btn--structure {
+    width: 100%;
+    justify-content: center;
   }
   .upgrade-link {
     bottom: 16px;
