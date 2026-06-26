@@ -75,8 +75,10 @@ export default function App() {
 
       {!SUPABASE_CONFIGURED && (
         <div className="notice">
-          Supabase isn’t configured yet — add your publishable key in
-          <code> src/lib/config.ts</code> to enable prompt generation and saving.
+          Running in <strong>local mode</strong> — no setup needed. Prompts are built
+          in your browser from the image, and Save Project writes to a folder you pick.
+          Add a Supabase key in <code>src/lib/config.ts</code> to use Claude-written
+          prompts and cloud save.
         </div>
       )}
 

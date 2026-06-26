@@ -33,7 +33,13 @@ export function SaveProjectButton({
     try {
       const res = await saveProject({ original, generated, interpretation, prompt })
       setState('saved')
-      setMessage(`Saved to Supabase (id ${res.id.slice(0, 8)}…).`)
+      setMessage(
+        res.where === 'supabase'
+          ? `Saved to Supabase (id ${res.id?.slice(0, 8)}…).`
+          : res.where === 'folder'
+            ? 'Saved to your chosen folder.'
+            : 'Downloaded the project files.',
+      )
     } catch (err) {
       setState('error')
       setMessage(String(err instanceof Error ? err.message : err))

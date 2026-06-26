@@ -9,6 +9,12 @@ with three transition states — **Fade · Slide · Zoom**. Save the finished pa
 The visual language is taken from the "Elements" neumorphic style board (soft
 blue-grey palette, diffused inner/outer shadows, thin wide-tracked labels).
 
+> **Works out of the box (local mode).** With no configuration, prompts are
+> generated **in your browser** from the uploaded image's real colours and mood,
+> and **Save Project** writes the two images + `interpretation.txt` to a folder you
+> pick. Configure Supabase + a Claude key (below) to upgrade to **Claude-written**
+> prompts and cloud save — the app picks the Claude path automatically when present.
+
 ## The workflow
 
 1. **Upload** a reference image (click · drag · or paste with ⌘/Ctrl+V).
@@ -46,6 +52,9 @@ Browser  ──►  Supabase Storage (images) + table `projects` (text)
   `projectApi.ts` (`generatePrompt`, `saveProject`).
 
 ## Setup
+
+You can skip this entirely — the app runs in local mode by default. Do it only to
+enable Claude-written prompts and cloud save.
 
 ### 1. Front-end key
 In `src/lib/config.ts`, set `SUPABASE_ANON_KEY` to your project's **publishable /
