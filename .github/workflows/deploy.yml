@@ -27,7 +27,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
@@ -37,11 +37,9 @@ jobs:
         run: npm run build
 
       - name: Configure Pages
-        # enablement: true auto-enables GitHub Pages (Actions source) via the API
-        # so no manual repo-settings step is required.
+        # Requires Pages to be enabled once in repo Settings → Pages →
+        # "Build and deployment" → Source: "GitHub Actions".
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
