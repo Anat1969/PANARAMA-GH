@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { dbDeleteProject, dbListProjects, type StoredProject } from '../lib/projectDb'
-import type { PromptResult } from '../lib/projectApi'
+import { listCloudProjects, type CloudProject, type PromptResult } from '../lib/projectApi'
 
 type LoadPayload = {
   originalFile: File
@@ -15,14 +15,68 @@ type Props = {
   onLoad: (payload: LoadPayload) => void
 }
 
+type UnifiedProject = {
+  id: string
+  createdAt: number
+  interpretation: string
+  prompt: string
+  source: 'local' | 'cloud'
+  thumbOriginal?: string
+  thumbGenerated?: string
+  originalUrl?: string
+  generatedUrl?: string
+  localProject?: StoredProject
+}
+
+function mergeProjects(
+  local: StoredProject[],
+  cloud: CloudProject[],
+): UnifiedProject[] {
+  const items: UnifiedProject[] = []
+
+  for (const p of local) {
+    items.push({
+      id: p.id,
+      createdAt: p.createdAt,
+      interpretation: p.interpretation,
+      prompt: p.prompt,
+      source: 'local',
+      thumbOriginal: p.thumbOriginal,
+      thumbGenerated: p.thumbGenerated,
+      localProject: p,
+    })
+  }
+
+  const localIds = new Set(local.map((p) => p.id))
+  for (const p of cloud) {
+    if (localIds.has(p.id)) continue
+    items.push({
+      id: p.id,
+      createdAt: p.createdAt,
+      interpretation: p.interpretation,
+      prompt: p.prompt,
+      source: 'cloud',
+      originalUrl: p.originalUrl,
+      generatedUrl: p.generatedUrl,
+    })
+  }
+
+  items.sort((a, b) => b.createdAt - a.createdAt)
+  return items
+}
+
 export function ProjectLibrary({ onClose, onLoad }: Props) {
-  const [projects, setProjects] = useState<StoredProject[]>([])
+  const [projects, setProjects] = useState<UnifiedProject[]>([])
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState<string | null>(null)
+  const [loadingProject, setLoadingProject] = useState<string | null>(null)
 
   useEffect(() => {
-    dbListProjects()
-      .then(setProjects)
+    Promise.all([
+      dbListProjects(),
+      listCloudProjects(),
+    ])
+      .then(([local, cloud]) => setProjects(mergeProjects(local, cloud)))
       .finally(() => setLoading(false))
   }, [])
 
@@ -33,20 +87,53 @@ export function ProjectLibrary({ onClose, onLoad }: Props) {
     setDeleting(null)
   }
 
-  const handleLoad = (p: StoredProject) => {
-    const originalFile = new File([p.originalBlob], 'original.jpg', {
-      type: p.originalBlob.type || 'image/jpeg',
-    })
-    const generatedFile = new File([p.generatedBlob], 'generated.jpg', {
-      type: p.generatedBlob.type || 'image/jpeg',
-    })
-    onLoad({
-      originalFile,
-      originalUrl: URL.createObjectURL(p.originalBlob),
-      generatedFile,
-      generatedUrl: URL.createObjectURL(p.generatedBlob),
-      result: { interpretation: p.interpretation, prompt: p.prompt },
-    })
+  const handleLoad = async (p: UnifiedProject) => {
+    if (p.source === 'local' && p.localProject) {
+      const lp = p.localProject
+      const originalFile = new File([lp.originalBlob], 'original.jpg', {
+        type: lp.originalBlob.type || 'image/jpeg',
+      })
+      const generatedFile = new File([lp.generatedBlob], 'generated.jpg', {
+        type: lp.generatedBlob.type || 'image/jpeg',
+      })
+      onLoad({
+        originalFile,
+        originalUrl: URL.createObjectURL(lp.originalBlob),
+        generatedFile,
+        generatedUrl: URL.createObjectURL(lp.generatedBlob),
+        result: { interpretation: lp.interpretation, prompt: lp.prompt },
+      })
+      return
+    }
+
+    if (p.source === 'cloud' && p.originalUrl && p.generatedUrl) {
+      setLoadingProject(p.id)
+      try {
+        const [origResp, genResp] = await Promise.all([
+          fetch(p.originalUrl),
+          fetch(p.generatedUrl),
+        ])
+        const [origBlob, genBlob] = await Promise.all([
+          origResp.blob(),
+          genResp.blob(),
+        ])
+        const originalFile = new File([origBlob], 'original.jpg', {
+          type: origBlob.type || 'image/jpeg',
+        })
+        const generatedFile = new File([genBlob], 'generated.jpg', {
+          type: genBlob.type || 'image/jpeg',
+        })
+        onLoad({
+          originalFile,
+          originalUrl: URL.createObjectURL(origBlob),
+          generatedFile,
+          generatedUrl: URL.createObjectURL(genBlob),
+          result: { interpretation: p.interpretation, prompt: p.prompt },
+        })
+      } finally {
+        setLoadingProject(null)
+      }
+    }
   }
 
   const formatDate = (ts: number) => {
@@ -81,26 +168,44 @@ export function ProjectLibrary({ onClose, onLoad }: Props) {
             {projects.map((p) => (
               <div key={p.id} className="library-card neu-raised">
                 <div className="library-card__thumbs">
-                  <img src={p.thumbOriginal} alt="" className="library-card__thumb" />
-                  <span className="library-card__arrow">→</span>
-                  <img src={p.thumbGenerated} alt="" className="library-card__thumb" />
+                  {p.source === 'local' && p.thumbOriginal && p.thumbGenerated ? (
+                    <>
+                      <img src={p.thumbOriginal} alt="" className="library-card__thumb" />
+                      <span className="library-card__arrow">&rarr;</span>
+                      <img src={p.thumbGenerated} alt="" className="library-card__thumb" />
+                    </>
+                  ) : p.source === 'cloud' && p.originalUrl && p.generatedUrl ? (
+                    <>
+                      <img src={p.originalUrl} alt="" className="library-card__thumb" loading="lazy" />
+                      <span className="library-card__arrow">&rarr;</span>
+                      <img src={p.generatedUrl} alt="" className="library-card__thumb" loading="lazy" />
+                    </>
+                  ) : null}
                 </div>
                 <p className="library-card__text">{p.interpretation}</p>
-                <span className="library-card__date">{formatDate(p.createdAt)}</span>
+                <div className="library-card__meta">
+                  <span className="library-card__date">{formatDate(p.createdAt)}</span>
+                  {p.source === 'cloud' && (
+                    <span className="library-card__badge">ענן</span>
+                  )}
+                </div>
                 <div className="library-card__actions">
                   <button
                     className="gen-btn"
                     onClick={() => handleLoad(p)}
+                    disabled={loadingProject === p.id}
                   >
-                    טעינה
+                    {loadingProject === p.id ? 'טוען…' : 'טעינה'}
                   </button>
-                  <button
-                    className="link-btn"
-                    onClick={() => handleDelete(p.id)}
-                    disabled={deleting === p.id}
-                  >
-                    {deleting === p.id ? 'מוחק…' : 'מחיקה'}
-                  </button>
+                  {p.source === 'local' && (
+                    <button
+                      className="link-btn"
+                      onClick={() => handleDelete(p.id)}
+                      disabled={deleting === p.id}
+                    >
+                      {deleting === p.id ? 'מוחק…' : 'מחיקה'}
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

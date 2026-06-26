@@ -666,10 +666,25 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+.library-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .library-card__date {
   font-size: 11px;
   letter-spacing: 0.1em;
   color: var(--c-text-soft);
+}
+.library-card__badge {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--c-bg);
+  box-shadow: var(--neu-inset-sm);
 }
 .library-card__actions {
   display: flex;

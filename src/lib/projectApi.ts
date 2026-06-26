@@ -111,3 +111,42 @@ export async function saveProject(args: SaveProjectArgs): Promise<SavedProject> 
 
   return { where: 'library' }
 }
+
+export type CloudProject = {
+  id: string
+  createdAt: number
+  interpretation: string
+  prompt: string
+  originalUrl: string
+  generatedUrl: string
+}
+
+export async function listCloudProjects(): Promise<CloudProject[]> {
+  if (!SUPABASE_CONFIGURED) return []
+
+  const { data, error } = await supabase
+    .from('projects')
+    .select('id, created_at, interpretation, prompt, original_path, generated_path')
+    .order('created_at', { ascending: false })
+    .limit(50)
+
+  if (error || !data) return []
+
+  return data.map((row) => {
+    const originalUrl = supabase.storage
+      .from(STORAGE_BUCKET)
+      .getPublicUrl(row.original_path).data.publicUrl
+    const generatedUrl = supabase.storage
+      .from(STORAGE_BUCKET)
+      .getPublicUrl(row.generated_path).data.publicUrl
+    return {
+      id: row.id,
+      createdAt: new Date(row.created_at).getTime(),
+      interpretation: row.interpretation ?? '',
+      prompt: row.prompt ?? '',
+      originalUrl,
+      generatedUrl,
+    }
+  })
+}
+
