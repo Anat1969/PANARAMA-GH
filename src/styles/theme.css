@@ -1,0 +1,92 @@
+/* ============================================================
+   Design tokens — extracted from the "Elements" style board
+   Neumorphic / Soft UI
+   ============================================================ */
+:root {
+  /* Palette (from the board's COLORS row) */
+  --c-bg: #eff2f9;        /* lightest — page background */
+  --c-surface: #e4ebf1;   /* card / surface tone */
+  --c-muted: #b5bfc6;     /* muted accent */
+  --c-accent: #6e7f8d;    /* darkest — text & active accent */
+
+  --c-text: #5a6b78;
+  --c-text-soft: #97a6b3;
+
+  /* Neumorphic shadow colors (from the SHADOWS row) */
+  --sh-light: #fafbff;            /* Shadow 1 — highlight, opacity 100% */
+  --sh-dark: rgba(22, 27, 29, 0.23); /* Shadow 2 — #161B1D @ 23% */
+
+  /* Shadow tiers mirror the board's X&Y / Blur values (5/10, 10/20, 20/40) */
+  --neu-sm: 5px 5px 10px var(--sh-dark), -5px -5px 10px var(--sh-light);
+  --neu-md: 10px 10px 20px var(--sh-dark), -10px -10px 20px var(--sh-light);
+  --neu-lg: 20px 20px 40px var(--sh-dark), -20px -20px 40px var(--sh-light);
+
+  /* Pressed / inset variants (the "INNER SHADOWS" column) */
+  --neu-inset-sm: inset 5px 5px 10px var(--sh-dark), inset -5px -5px 10px var(--sh-light);
+  --neu-inset-md: inset 10px 10px 20px var(--sh-dark), inset -10px -10px 20px var(--sh-light);
+
+  /* Typography */
+  --font-display: 'Jost', 'Campton', system-ui, sans-serif;   /* Campton substitute */
+  --font-body: 'Nunito Sans', 'Avenir Next', system-ui, sans-serif; /* Avenir Next substitute */
+
+  /* Motion */
+  --transition-dur: 600ms;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --radius-lg: 32px;
+  --radius-md: 22px;
+  --radius-sm: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ---- Reusable neumorphic surfaces ---- */
+.neu-raised {
+  background: var(--c-bg);
+  box-shadow: var(--neu-md);
+}
+
+.neu-raised-lg {
+  background: var(--c-bg);
+  box-shadow: var(--neu-lg);
+}
+
+.neu-pressed {
+  background: var(--c-bg);
+  box-shadow: var(--neu-inset-sm);
+}
+
+button {
+  font-family: inherit;
+  color: var(--c-accent);
+  cursor: pointer;
+  border: none;
+  background: var(--c-bg);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-dur: 1ms;
+  }
+}

@@ -1,0 +1,111 @@
+/* ============================================================
+   Image transition states — Fade, Slide, Zoom
+   Two stacked layers in <ImageStage/>:
+     .layer--current  = the image now showing
+     .layer--prev     = the previous image animating out
+   The active effect + direction is set via data attributes on
+   the stage wrapper:
+     data-transition="fade | slide | zoom"
+     data-direction="next | prev"
+   ============================================================ */
+
+.stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  will-change: opacity, transform;
+}
+
+/* The current layer always animates IN from its start state to neutral. */
+.layer--current {
+  z-index: 2;
+  animation-duration: var(--transition-dur);
+  animation-timing-function: var(--ease);
+  animation-fill-mode: both;
+}
+
+/* The previous layer animates OUT (only present while animating). */
+.layer--prev {
+  z-index: 1;
+  animation-duration: var(--transition-dur);
+  animation-timing-function: var(--ease);
+  animation-fill-mode: both;
+}
+
+/* When not animating, the current layer just sits still. */
+.stage[data-animating='false'] .layer--current {
+  animation: none;
+}
+
+/* ---------------- FADE ---------------- */
+.stage[data-transition='fade'][data-animating='true'] .layer--current {
+  animation-name: fade-in;
+}
+.stage[data-transition='fade'][data-animating='true'] .layer--prev {
+  animation-name: fade-out;
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* ---------------- SLIDE ---------------- */
+.stage[data-transition='slide'][data-direction='next'][data-animating='true'] .layer--current {
+  animation-name: slide-in-from-right;
+}
+.stage[data-transition='slide'][data-direction='next'][data-animating='true'] .layer--prev {
+  animation-name: slide-out-to-left;
+}
+.stage[data-transition='slide'][data-direction='prev'][data-animating='true'] .layer--current {
+  animation-name: slide-in-from-left;
+}
+.stage[data-transition='slide'][data-direction='prev'][data-animating='true'] .layer--prev {
+  animation-name: slide-out-to-right;
+}
+@keyframes slide-in-from-right {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+@keyframes slide-out-to-left {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
+}
+@keyframes slide-in-from-left {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+@keyframes slide-out-to-right {
+  from { transform: translateX(0); }
+  to   { transform: translateX(100%); }
+}
+
+/* ---------------- ZOOM ---------------- */
+.stage[data-transition='zoom'][data-animating='true'] .layer--current {
+  animation-name: zoom-in;
+}
+.stage[data-transition='zoom'][data-animating='true'] .layer--prev {
+  animation-name: zoom-out;
+}
+@keyframes zoom-in {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes zoom-out {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(1.1); }
+}
