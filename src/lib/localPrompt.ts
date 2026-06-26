@@ -131,6 +131,9 @@ const LENSES = [
   { en: 'warm minimalism, plaster walls and soft boucle', he: 'מינימליזם חמים, קירות טיח ובוקלה רכה' },
   { en: 'tonal monochrome, single-hue layering', he: 'מונוכרום טונאלי, שכבות בגוון אחד' },
   { en: 'biophilic stillness, a few sculptural plants', he: 'שלווה ביופילית, כמה צמחים פסליים' },
+  { en: 'Mediterranean serenity, lime-washed walls and terracotta', he: 'שלווה ים-תיכונית, קירות סיד וטרקוטה' },
+  { en: 'wabi-sabi simplicity, imperfect ceramics and raw wood', he: 'פשטות ואבי-סאבי, קרמיקה לא מושלמת ועץ גולמי' },
+  { en: 'coastal minimal, driftwood and bleached tones', he: 'מינימליזם חופי, עץ סחף וגוונים שטופי שמש' },
 ]
 
 const LIGHTS = [
@@ -138,7 +141,37 @@ const LIGHTS = [
   { en: 'overcast even daylight', he: 'אור יום אחיד ומעונן' },
   { en: 'low golden afternoon light', he: 'אור אחר־צהריים זהוב ונמוך' },
   { en: 'gentle north-facing window light', he: 'אור עדין מחלון צפוני' },
+  { en: 'warm sunset glow through sheer curtains', he: 'זוהר שקיעה חמים דרך וילונות שקופים' },
+  { en: 'cool blue twilight ambiance', he: 'אווירת דמדומים כחולה וקרירה' },
 ]
+
+const MATERIALS = [
+  { en: 'raw linen and light oak', he: 'פשתן גולמי ואלון בהיר' },
+  { en: 'polished concrete and walnut', he: 'בטון מוחלק ואגוז' },
+  { en: 'matte ceramic and pale birch', he: 'קרמיקה מאט וליבנה בהירה' },
+  { en: 'travertine and brushed brass', he: 'טרוורטין ופליז מוברש' },
+  { en: 'washed cotton and rattan', he: 'כותנה שטופה וראטן' },
+  { en: 'lime plaster and natural stone', he: 'טיח סיד ואבן טבעית' },
+]
+
+const CAMERAS = [
+  { en: 'wide-angle architectural lens', he: 'עדשה רחבה אדריכלית' },
+  { en: '35mm eye-level perspective', he: 'פרספקטיבה בגובה העיניים 35מ״מ' },
+  { en: 'telephoto compressed perspective', he: 'פרספקטיבה דחוסה טלפוטו' },
+  { en: 'medium format, shallow depth of field', he: 'פורמט בינוני, עומק שדה רדוד' },
+]
+
+const ROOMS = [
+  { en: 'open living room', he: 'סלון פתוח' },
+  { en: 'serene bedroom', he: 'חדר שינה שליו' },
+  { en: 'sunlit reading nook', he: 'פינת קריאה מוצפת שמש' },
+  { en: 'minimalist studio', he: 'סטודיו מינימליסטי' },
+  { en: 'airy kitchen-dining space', he: 'מטבח-פינת אוכל אווריריים' },
+]
+
+function pick<T>(arr: readonly T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)]
+}
 
 function moodWords(a: Analysis): { en: string; he: string } {
   const bright =
@@ -171,30 +204,26 @@ export async function localPrompt(
   const paletteHe = palette.map((p) => p.name.he).join(', ')
   const mood = moodWords(a)
 
-  // Vary the lens/light each refine (and fold in any feedback).
-  const variant =
-    opts.mode === 'refine'
-      ? ((opts.previousPrompt?.length ?? 0) + (opts.feedback?.length ?? 0) + 1)
-      : 0
-  const lens = LENSES[variant % LENSES.length]
-  const light = LIGHTS[variant % LIGHTS.length]
+  const lens = pick(LENSES)
+  const light = pick(LIGHTS)
+  const material = pick(MATERIALS)
+  const camera = pick(CAMERAS)
+  const room = pick(ROOMS)
   const feedback = (opts.feedback ?? '').trim()
   const tempHe = a.temperature === 'warm' ? 'חם ומעוגן' : a.temperature === 'cool' ? 'קריר ושקט' : 'מאוזן וניטרלי'
 
-  // Interpretation — in Hebrew.
   const interpretation =
     `התמונה שלך נקראת ${mood.he}, ובנויה בעיקר מ${paletteHe}. ` +
-    `בתרגום למרחב מחיה מינימליסטי, זה הופך לחדר שליו באותה פלטה — ` +
-    `משטחים ב${tempHe} תחת ${light.he}, נקי ומרגיע` +
-    (opts.mode === 'refine' ? `, בגישת ${lens.he}.` : '.')
+    `בתרגום למרחב מחיה מינימליסטי, זה הופך ל${room.he} שליו באותה פלטה — ` +
+    `${material.he} ב${tempHe} תחת ${light.he}, בגישת ${lens.he}.`
 
-  // Midjourney prompt — in English.
   const prompt =
-    `minimalist living space interior, ${lens.en}, ` +
-    `palette of ${paletteEn}, ${mood.en} atmosphere, ${light.en}, ` +
-    `uncluttered, soft neumorphic shadows, natural materials, calm and serene` +
+    `${room.en}, ${lens.en}, ` +
+    `palette of ${paletteEn}, ${material.en}, ` +
+    `${mood.en} atmosphere, ${light.en}, ` +
+    `uncluttered, soft neumorphic shadows, calm and serene` +
     (feedback ? `, ${feedback}` : '') +
-    `, architectural interior photography --ar 3:2 --style raw --v 6`
+    `, ${camera.en}, interior photography --ar 3:2 --style raw --v 6`
 
   return { interpretation, prompt }
 }
