@@ -21,6 +21,11 @@ labels, lots of whitespace, and almost no UI chrome.
   also advances — so the gallery is navigable with zero visible buttons.
 - **Preset demo gallery** — works out of the box; each image has an on-brand
   gradient fallback that renders even without network access.
+- **Generate Space** — a button that creates an AI image of a *minimalist living
+  space* inspired by the board, appends it to the gallery, and transitions to it.
+  Runs fully client-side with **no API key** via [Pollinations](https://pollinations.ai)
+  (a fresh seed per click → a new image each time); a gradient placeholder shows
+  while it loads.
 - A thin caption label (`01  Still Water`) under the image, board-style.
 - Fully responsive; respects `prefers-reduced-motion`.
 
@@ -69,7 +74,8 @@ src/
   components/
     ImageStage.tsx      # two stacked layers; applies the active transition
     TransitionPicker.tsx# 3 plain text labels (Fade / Slide / Zoom)
-  data/images.ts        # preset demo gallery + gradient fallbacks
+    GenerateButton.tsx  # "Generate Space" — keyless AI image (Pollinations)
+  data/images.ts        # preset gallery + gradient fallbacks + generator helper
   hooks/useGallery.ts   # index / transition / direction state
   styles/
     theme.css           # design tokens + neumorphic surfaces

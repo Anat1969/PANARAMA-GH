@@ -50,3 +50,33 @@ export const IMAGES: GalleryImage[] = [
     subtitle: 'No. 05',
   },
 ]
+
+/** On-brand prompt for the "Generate Space" button (matches the inspiration board). */
+export const MINIMAL_SPACE_PROMPT =
+  'minimalist living space, serene scandinavian interior, soft pale blue-grey ' +
+  'palette, neumorphic diffused soft shadows, airy and calm, natural daylight, ' +
+  'muted tones, clean architectural photography, uncluttered, soft focus'
+
+const GEN_FALLBACKS = [
+  'linear-gradient(135deg, #eff2f9 0%, #b5bfc6 100%)',
+  'linear-gradient(135deg, #e4ebf1 0%, #6e7f8d 100%)',
+  'linear-gradient(135deg, #b5bfc6 0%, #eff2f9 100%)',
+]
+
+/**
+ * Build a freshly generated gallery image from a keyless Pollinations URL.
+ * A new `seed` yields a new image; `n` is the gallery position (for the label).
+ */
+export function buildGeneratedImage(seed: number, n: number): GalleryImage {
+  const url =
+    'https://image.pollinations.ai/prompt/' +
+    encodeURIComponent(MINIMAL_SPACE_PROMPT) +
+    `?width=1200&height=800&seed=${seed}&nologo=true&model=flux`
+  return {
+    id: `generated-${seed}`,
+    src: url,
+    fallback: GEN_FALLBACKS[seed % GEN_FALLBACKS.length],
+    title: 'Generated Space',
+    subtitle: `No. ${String(n).padStart(2, '0')}`,
+  }
+}
