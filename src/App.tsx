@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react'
 import { ImageDrop } from './components/ImageDrop'
 import { ImageStage } from './components/ImageStage'
+import { ProjectLibrary } from './components/ProjectLibrary'
 import { PromptPanel } from './components/PromptPanel'
 import { SaveProjectButton } from './components/SaveProjectButton'
 import { TransitionPicker } from './components/TransitionPicker'
+import { UpgradeLink } from './components/UpgradeLink'
 import { imageFromUrl } from './data/images'
 import { useGallery, type TransitionType } from './hooks/useGallery'
 import { SUPABASE_CONFIGURED } from './lib/config'
@@ -18,6 +20,7 @@ export default function App() {
   const [result, setResult] = useState<PromptResult | null>(null)
   const [isBusy, setIsBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showLibrary, setShowLibrary] = useState(false)
 
   const g = useGallery(2)
 
@@ -46,6 +49,22 @@ export default function App() {
     }
   }
 
+  const loadFromLibrary = (payload: {
+    originalFile: File
+    originalUrl: string
+    generatedFile: File
+    generatedUrl: string
+    result: PromptResult
+  }) => {
+    if (original) URL.revokeObjectURL(original.url)
+    if (generated) URL.revokeObjectURL(generated.url)
+    setOriginal({ file: payload.originalFile, url: payload.originalUrl })
+    setGenerated({ file: payload.generatedFile, url: payload.generatedUrl })
+    setResult(payload.result)
+    setError(null)
+    setShowLibrary(false)
+  }
+
   const play = (t: TransitionType) => {
     g.setTransition(t)
     g.next()
@@ -71,6 +90,12 @@ export default function App() {
           <h1 className="masthead__title">Panarama</h1>
           <p className="masthead__sub">תמונה · פרומפט · מעבר</p>
         </div>
+        <button
+          className="masthead__library-btn"
+          onClick={() => setShowLibrary(true)}
+        >
+          ספרייה
+        </button>
       </header>
 
       {!SUPABASE_CONFIGURED && (
@@ -156,6 +181,15 @@ export default function App() {
           </section>
         )}
       </main>
+
+      {showLibrary && (
+        <ProjectLibrary
+          onClose={() => setShowLibrary(false)}
+          onLoad={loadFromLibrary}
+        />
+      )}
+
+      <UpgradeLink />
     </div>
   )
 }

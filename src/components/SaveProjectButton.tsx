@@ -38,7 +38,9 @@ export function SaveProjectButton({
           ? `נשמר ל-Supabase (מזהה ${res.id?.slice(0, 8)}…).`
           : res.where === 'folder'
             ? 'נשמר לתיקייה שבחרת.'
-            : 'קבצי הפרויקט הורדו.',
+            : res.where === 'library'
+              ? 'נשמר בספרייה.'
+              : 'קבצי הפרויקט הורדו.',
       )
     } catch (err) {
       setState('error')

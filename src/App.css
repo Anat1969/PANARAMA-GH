@@ -529,3 +529,191 @@
     font-size: 17px;
   }
 }
+
+/* ============================================================
+   Library button in masthead
+   ============================================================ */
+.masthead__library-btn {
+  margin-inline-start: auto;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: var(--c-bg);
+  box-shadow: var(--neu-sm);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: var(--c-accent);
+  transition: box-shadow 200ms var(--ease), transform 200ms var(--ease);
+}
+.masthead__library-btn:hover {
+  transform: translateY(-1px);
+}
+.masthead__library-btn:active {
+  box-shadow: var(--neu-inset-sm);
+  transform: translateY(0);
+}
+
+/* ============================================================
+   Project Library overlay
+   ============================================================ */
+.library-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(239, 242, 249, 0.85);
+  backdrop-filter: blur(12px);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  overflow-y: auto;
+}
+.library-container {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.library-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.library-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 24px;
+  letter-spacing: 0.12em;
+  color: var(--c-accent);
+  margin: 0;
+}
+.library-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--c-bg);
+  box-shadow: var(--neu-sm);
+  color: var(--c-accent);
+  font-size: 16px;
+  display: grid;
+  place-items: center;
+  transition: box-shadow 200ms var(--ease);
+}
+.library-close:hover {
+  box-shadow: var(--neu-inset-sm);
+}
+.library-empty {
+  text-align: center;
+  font-size: 14px;
+  color: var(--c-text-soft);
+  padding: 40px 0;
+}
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+.library-card {
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.library-card__thumbs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+.library-card__thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  box-shadow: var(--neu-inset-sm);
+}
+.library-card__arrow {
+  color: var(--c-muted);
+  font-size: 18px;
+}
+.library-card__text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--c-text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.library-card__date {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--c-text-soft);
+}
+.library-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.library-card__actions .gen-btn {
+  flex: 1;
+  justify-content: center;
+  padding: 8px 14px;
+  font-size: 11px;
+}
+
+/* ============================================================
+   Upgrade link — fixed pill on the left edge
+   ============================================================ */
+.upgrade-link {
+  position: fixed;
+  bottom: 24px;
+  inset-inline-start: 18px;
+  z-index: 900;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+  background: var(--c-bg);
+  text-decoration: none;
+  transition: box-shadow 200ms var(--ease), transform 200ms var(--ease);
+}
+.upgrade-link:hover {
+  transform: translateY(-1px);
+}
+.upgrade-link:active {
+  box-shadow: var(--neu-inset-sm);
+  transform: translateY(0);
+}
+.upgrade-link svg {
+  color: var(--c-muted);
+}
+
+/* ---- Library mobile ---- */
+@media (max-width: 640px) {
+  .library-overlay {
+    padding: 16px;
+  }
+  .library-grid {
+    grid-template-columns: 1fr;
+  }
+  .masthead__library-btn {
+    padding: 6px 14px;
+    font-size: 11px;
+  }
+  .upgrade-link {
+    bottom: 16px;
+    inset-inline-start: 12px;
+    padding: 6px 12px;
+    font-size: 10px;
+  }
+}

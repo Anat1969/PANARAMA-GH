@@ -1,5 +1,6 @@
 import { STORAGE_BUCKET, SUPABASE_CONFIGURED } from './config'
 import { localPrompt } from './localPrompt'
+import { dbSaveProject } from './projectDb'
 import { supabase } from './supabase'
 
 export type PromptResult = {
@@ -69,7 +70,7 @@ export type SaveProjectArgs = {
 }
 
 export type SavedProject = {
-  where: 'supabase' | 'folder' | 'downloads'
+  where: 'supabase' | 'folder' | 'downloads' | 'library'
   id?: string
   originalUrl?: string
   generatedUrl?: string
@@ -98,6 +99,9 @@ function triggerDownload(blob: Blob, name: string) {
 
 /** Save the project to a folder on the user's machine (no backend needed). */
 export async function saveProjectLocal(args: SaveProjectArgs): Promise<SavedProject> {
+  // Always persist to IndexedDB so the project survives in the in-app library.
+  await dbSaveProject(args)
+
   const oExt = ext(args.original)
   const gExt = ext(args.generated)
   const doc = interpretationDoc(args)
@@ -125,9 +129,9 @@ export async function saveProjectLocal(args: SaveProjectArgs): Promise<SavedProj
       await write('project.json', json)
       return { where: 'folder' }
     } catch (err) {
-      // User cancelled the picker — abort quietly.
+      // User cancelled the folder picker — still saved to in-app library.
       if (err instanceof DOMException && err.name === 'AbortError') {
-        throw new Error('Save cancelled.')
+        return { where: 'library' }
       }
       // Otherwise fall through to downloads.
     }
@@ -146,6 +150,8 @@ export async function saveProject(args: SaveProjectArgs): Promise<SavedProject> 
   if (!SUPABASE_CONFIGURED) {
     return saveProjectLocal(args)
   }
+  // Also persist to IndexedDB for the in-app library.
+  await dbSaveProject(args).catch(() => {})
   const stamp = `${Date.now()}-${Math.floor(Math.random() * 1e6)}`
   const originalPath = `${stamp}/original.${ext(args.original)}`
   const generatedPath = `${stamp}/generated.${ext(args.generated)}`
