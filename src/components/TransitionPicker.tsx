@@ -2,40 +2,36 @@ import type { TransitionType } from '../hooks/useGallery'
 
 type Props = {
   value: TransitionType
-  onChange: (t: TransitionType) => void
+  /** Fires on every click — even re-clicking the active effect, so it replays. */
+  onSelect: (t: TransitionType) => void
 }
 
-const OPTIONS: { key: TransitionType; label: string; hint: string }[] = [
-  { key: 'fade', label: 'Fade', hint: 'Crossfade dissolve' },
-  { key: 'slide', label: 'Slide', hint: 'Horizontal slide' },
-  { key: 'zoom', label: 'Zoom', hint: 'Scale & fade' },
+const OPTIONS: { key: TransitionType; label: string }[] = [
+  { key: 'fade', label: 'Fade' },
+  { key: 'slide', label: 'Slide' },
+  { key: 'zoom', label: 'Zoom' },
 ]
 
 /**
- * Three neumorphic toggle buttons. The selected one uses the pressed/inset
- * shadow (the board's "INNER SHADOWS" state).
+ * Three plain thin text labels — the only control in the minimalist layout.
+ * Clicking a label selects that effect and plays it (App advances the image).
  */
-export function TransitionPicker({ value, onChange }: Props) {
+export function TransitionPicker({ value, onSelect }: Props) {
   return (
-    <div className="picker" role="tablist" aria-label="Transition effect">
-      <span className="picker__label">Transition</span>
-      <div className="picker__group">
-        {OPTIONS.map((opt) => {
-          const active = opt.key === value
-          return (
-            <button
-              key={opt.key}
-              role="tab"
-              aria-selected={active}
-              title={opt.hint}
-              className={`picker__btn ${active ? 'is-active' : ''}`}
-              onClick={() => onChange(opt.key)}
-            >
-              {opt.label}
-            </button>
-          )
-        })}
-      </div>
-    </div>
+    <nav className="picker" aria-label="Transition effect">
+      {OPTIONS.map((opt) => {
+        const active = opt.key === value
+        return (
+          <button
+            key={opt.key}
+            aria-pressed={active}
+            className={`picker__item ${active ? 'is-active' : ''}`}
+            onClick={() => onSelect(opt.key)}
+          >
+            {opt.label}
+          </button>
+        )
+      })}
+    </nav>
   )
 }

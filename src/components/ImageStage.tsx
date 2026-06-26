@@ -9,6 +9,8 @@ type Props = {
   direction: Direction
   transition: TransitionType
   isAnimating: boolean
+  /** Advance to the next image using the current effect. */
+  onAdvance?: () => void
 }
 
 function layerStyle(img: GalleryImage): CSSProperties {
@@ -29,12 +31,29 @@ export function ImageStage({
   direction,
   transition,
   isAnimating,
+  onAdvance,
 }: Props) {
   const current = images[index]
   const previous = prevIndex !== null ? images[prevIndex] : null
 
   return (
-    <div className="stage-frame neu-raised-lg">
+    <div
+      className="stage-frame neu-raised-lg"
+      onClick={onAdvance}
+      role={onAdvance ? 'button' : undefined}
+      aria-label={onAdvance ? 'Next image' : undefined}
+      tabIndex={onAdvance ? 0 : undefined}
+      onKeyDown={
+        onAdvance
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                onAdvance()
+              }
+            }
+          : undefined
+      }
+    >
       <div
         className="stage"
         data-transition={transition}
@@ -56,11 +75,6 @@ export function ImageStage({
           role="img"
           aria-label={current.title}
         />
-
-        <div className="stage-caption">
-          <span className="stage-caption__sub">{current.subtitle}</span>
-          <span className="stage-caption__title">{current.title}</span>
-        </div>
       </div>
     </div>
   )

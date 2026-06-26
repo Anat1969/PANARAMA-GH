@@ -8,14 +8,20 @@ aesthetic from the "Elements" design board.
 
 ## Features
 
-- **3 transition states.** Pick how images cross over with a neumorphic toggle:
+A deliberately **minimalist, single-column layout** echoing the sparse "Elements"
+inspiration board: a numbered `3 | Panarama` header, thin wide-tracked uppercase
+labels, lots of whitespace, and almost no UI chrome.
+
+- **3 transition states**, selected with three plain text labels (the only control):
   - **Fade** — crossfade dissolve
-  - **Slide** — horizontal slide (direction follows next/prev)
+  - **Slide** — horizontal slide
   - **Zoom** — scale-and-fade
+- **The picker is the interaction.** Clicking Fade / Slide / Zoom selects that
+  effect *and* plays it by advancing to the next image. Clicking the image itself
+  also advances — so the gallery is navigable with zero visible buttons.
 - **Preset demo gallery** — works out of the box; each image has an on-brand
   gradient fallback that renders even without network access.
-- **Controls** — previous / next plus autoplay (play / pause).
-- **Thumbnail strip** — jump straight to any image.
+- A thin caption label (`01  Still Water`) under the image, board-style.
 - Fully responsive; respects `prefers-reduced-motion`.
 
 ## Design system
@@ -62,15 +68,13 @@ npm run preview  # preview the production build
 src/
   components/
     ImageStage.tsx      # two stacked layers; applies the active transition
-    TransitionPicker.tsx# 3 neumorphic toggle buttons
-    Controls.tsx        # prev / next / autoplay
-    Thumbnails.tsx      # thumbnail strip
+    TransitionPicker.tsx# 3 plain text labels (Fade / Slide / Zoom)
   data/images.ts        # preset demo gallery + gradient fallbacks
-  hooks/useGallery.ts   # index / transition / direction / autoplay state
+  hooks/useGallery.ts   # index / transition / direction state
   styles/
     theme.css           # design tokens + neumorphic surfaces
     transitions.css     # fade / slide / zoom keyframes
-  App.tsx               # layout
+  App.tsx               # minimalist single-column layout
 ```
 
 ## How the transitions work
