@@ -14,7 +14,7 @@ export const SUPABASE_URL =
   ENV.VITE_SUPABASE_URL || 'https://slcpldoaaagkoozpbjsk.supabase.co'
 
 export const SUPABASE_ANON_KEY =
-  ENV.VITE_SUPABASE_ANON_KEY || 'REPLACE_WITH_PUBLISHABLE_ANON_KEY'
+  ENV.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNsY3BsZG9hYWFna29venBianNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3OTM0MjEsImV4cCI6MjA5NDM2OTQyMX0.g0iLhliFQNlD3Ey_mrvwMolppj-nV24Pj9klrFtsLWo'
 
 /** True once a real key has been provided (so the UI can prompt to configure). */
 export const SUPABASE_CONFIGURED =

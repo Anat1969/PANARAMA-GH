@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ImageDrop } from './components/ImageDrop'
 import { ImageStage } from './components/ImageStage'
 import { ProjectLibrary } from './components/ProjectLibrary'
@@ -21,7 +21,9 @@ export default function App() {
   const [isBusy, setIsBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showLibrary, setShowLibrary] = useState(false)
+  const [scrollToTransition, setScrollToTransition] = useState(false)
 
+  const transitionRef = useRef<HTMLElement>(null)
   const g = useGallery(2)
 
   const setSlot =
@@ -72,7 +74,15 @@ export default function App() {
     setResult(payload.result)
     setError(null)
     setShowLibrary(false)
+    setScrollToTransition(true)
   }
+
+  useEffect(() => {
+    if (scrollToTransition && transitionRef.current) {
+      transitionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      setScrollToTransition(false)
+    }
+  }, [scrollToTransition, original, generated])
 
   const play = (t: TransitionType) => {
     g.setTransition(t)
@@ -170,7 +180,7 @@ export default function App() {
 
         {/* Step 4 — connect the two images with a transition */}
         {pair && (
-          <section className="step">
+          <section className="step" ref={transitionRef}>
             <span className="step__num">04</span>
             <div className="step__body">
               <span className="section-label">מעבר</span>
@@ -198,6 +208,22 @@ export default function App() {
             </div>
           </section>
         )}
+
+        {/* Upgrade */}
+        <section className="upgrade-section">
+          <a
+            className="upgrade-btn neu-raised"
+            href="https://anat1969.github.io/PANARAMA-GH/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 19V5" />
+              <path d="M5 12l7-7 7 7" />
+            </svg>
+            שדרוג לגרסה המלאה
+          </a>
+        </section>
       </main>
 
       {showLibrary && (

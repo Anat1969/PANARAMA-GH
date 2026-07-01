@@ -699,6 +699,40 @@
 }
 
 /* ============================================================
+   Upgrade section — in-flow button
+   ============================================================ */
+.upgrade-section {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 16px;
+}
+.upgrade-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+  text-decoration: none;
+  transition: box-shadow 200ms var(--ease), transform 200ms var(--ease);
+}
+.upgrade-btn:hover {
+  transform: translateY(-2px);
+}
+.upgrade-btn:active {
+  box-shadow: var(--neu-inset-sm);
+  transform: translateY(0);
+}
+.upgrade-btn svg {
+  color: var(--c-muted);
+}
+
+/* ============================================================
    Upgrade link — fixed pill on the left edge
    ============================================================ */
 .upgrade-link {
