@@ -1,8 +1,9 @@
 // Supabase Edge Function: generate-prompt
 //
 // Receives an uploaded image (base64) and asks Claude to interpret it and write
-// a Midjourney prompt for a minimalist living space inspired by it. The Anthropic
-// API key lives only here (Deno env secret ANTHROPIC_API_KEY) — never in the client.
+// a Midjourney prompt for an architectural interior living space inspired by the
+// landscape's DNA. The Anthropic API key lives only here (Deno env secret
+// ANTHROPIC_API_KEY) — never in the client.
 //
 // Deploy:  supabase functions deploy generate-prompt --no-verify-jwt
 //          (or via the Supabase MCP deploy_edge_function tool)
@@ -25,34 +26,32 @@ const OUTPUT_SCHEMA = {
     interpretation: {
       type: 'string',
       description:
-        'IN HEBREW: two to four sentences explaining how the uploaded image (its ' +
-        'palette, mood, light and composition) is interpreted as a minimalist ' +
-        'living space.',
+        'IN HEBREW: two to four sentences explaining how the uploaded landscape ' +
+        'image — its palette, mood, light and composition — inspires an ' +
+        'architectural interior living space. Reference the landscape DNA.',
     },
     prompt: {
       type: 'string',
       description:
-        'A single Midjourney-ready prompt for that minimalist living space, ' +
-        'ending with parameters like --ar 3:2 --style raw --v 6.',
+        'A single Midjourney-ready prompt for an architectural interior living ' +
+        'space inspired by the landscape DNA of the uploaded image, ending with ' +
+        'parameters like --ar 3:2 --style raw --v 6.',
     },
   },
   required: ['interpretation', 'prompt'],
 }
 
-const SYSTEM_PROMPT = `You translate an uploaded reference image into a calm, MINIMALIST LIVING SPACE.
+const SYSTEM_PROMPT = `You are an architect's creative partner. You translate an uploaded LANDSCAPE or reference image into an ARCHITECTURAL INTERIOR LIVING SPACE inspired by that landscape's DNA.
 
-Read the reference image carefully: its dominant colours, overall mood, lighting,
-contrast and composition. Then imagine a serene, uncluttered interior living space
-that carries the SAME palette and feeling — soft, airy, neumorphic, with diffused
-natural light and a restrained material palette.
+Read the reference image carefully — its dominant colours, light rhythm, horizon lines, organic textures, depth, atmosphere, emotional essence and natural forms. Then design a unique architectural interior that draws its soul from this landscape: the palette, materials, spatial feeling and light all echo the DNA of the original scene.
+
+Each response must be genuinely DIFFERENT from any previous one. Vary the architectural style (e.g. organic modernism, Japandi, desert modernism, Mediterranean revival, brutalist warmth, biophilic, tropical modernism, neo-vernacular, pavilion style, Scandinavian), the space type (double-height living room, courtyard, conversation pit, cantilevered bedroom, vaulted kitchen, glass-walled study, master suite, entrance hall, library loft, spa bathroom), the lighting approach, materials and camera angle.
 
 Return:
-- "interpretation": IN HEBREW — 2-4 sentences, warm plain language, explaining what
-  you read in the image and how it becomes this living space (name the colours/mood).
-- "prompt": IN ENGLISH — ONE Midjourney prompt describing that living space —
-  concrete nouns, materials, light, mood, lens — ending with: --ar 3:2 --style raw --v 6
+- "interpretation": IN HEBREW — 2-4 sentences, warm plain language. Explain what you read in the landscape's DNA (name the colours, light, mood, forms) and how it translates into this specific architectural interior.
+- "prompt": IN ENGLISH — ONE Midjourney prompt for that architectural interior living space — concrete nouns, specific materials, architectural details, light quality, mood, lens — ending with: --ar 3:2 --style raw --v 6
 
-Keep it tasteful and specific. Do not mention the reference image inside "prompt".
+Keep it tasteful, specific and architecturally grounded. Do not mention "reference image" or "landscape" inside "prompt" — describe the interior as if it exists.
 The interpretation MUST be Hebrew; the prompt MUST be English.`
 
 function refineInstruction(previousPrompt: string, feedback?: string): string {
@@ -63,9 +62,9 @@ function refineInstruction(previousPrompt: string, feedback?: string): string {
       ? `The user gave this feedback: "${feedback.trim()}". `
       : `The user wants a different take. `) +
     `Produce a clearly DIFFERENT, refined interpretation and prompt — vary the ` +
-    `lighting, styling lens (e.g. Japandi / warm-minimal / monochrome / biophilic), ` +
-    `materials or time of day — while staying faithful to the reference image's ` +
-    `palette and calm mood.`
+    `architectural style, space type, lighting approach, materials or camera angle ` +
+    `— while staying faithful to the landscape's DNA: its palette, forms and ` +
+    `emotional essence.`
   )
 }
 
@@ -104,7 +103,7 @@ Deno.serve(async (req: Request) => {
     const userText =
       mode === 'refine' && previousPrompt
         ? refineInstruction(previousPrompt, feedback)
-        : 'Interpret this image as a minimalist living space and write the prompt.'
+        : 'Read this landscape\'s DNA and design an architectural interior living space inspired by it. Write the prompt.'
 
     const anthropicReq = {
       model: MODEL,

@@ -115,8 +115,8 @@ export default function App() {
 
       {!SUPABASE_CONFIGURED && (
         <div className="notice">
-          פועל ב<strong>מצב מקומי</strong> — ללא הגדרות. הפרומפט נבנה בדפדפן מתוך
-          התמונה, ו"שמירת פרויקט" שומרת לתיקייה שתבחרו. הוסיפו מפתח Supabase ב־
+          פועל ב<strong>מצב מקומי</strong> — הפרומפט נבנה בדפדפן מתוך התמונה
+          והפרויקטים נשמרים בספרייה הפנימית. הוסיפו מפתח Supabase ב־
           <code>src/lib/config.ts</code> כדי לקבל פרומפט שכתוב על־ידי Claude ושמירה בענן.
         </div>
       )}
