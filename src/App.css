@@ -531,10 +531,14 @@
 }
 
 /* ============================================================
-   Library button in masthead
+   Masthead action buttons (new project + library)
    ============================================================ */
-.masthead__library-btn {
+.masthead__actions {
   margin-inline-start: auto;
+  display: flex;
+  gap: 10px;
+}
+.masthead__action-btn {
   padding: 8px 18px;
   border-radius: 999px;
   background: var(--c-bg);
@@ -546,10 +550,10 @@
   color: var(--c-accent);
   transition: box-shadow 200ms var(--ease), transform 200ms var(--ease);
 }
-.masthead__library-btn:hover {
+.masthead__action-btn:hover {
   transform: translateY(-1px);
 }
-.masthead__library-btn:active {
+.masthead__action-btn:active {
   box-shadow: var(--neu-inset-sm);
   transform: translateY(0);
 }
@@ -706,7 +710,10 @@
   .library-grid {
     grid-template-columns: 1fr;
   }
-  .masthead__library-btn {
+  .masthead__actions {
+    gap: 8px;
+  }
+  .masthead__action-btn {
     padding: 6px 14px;
     font-size: 11px;
   }

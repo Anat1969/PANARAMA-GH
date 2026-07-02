@@ -65,6 +65,16 @@ export default function App() {
     setShowLibrary(false)
   }
 
+  const newProject = () => {
+    if (original) URL.revokeObjectURL(original.url)
+    if (generated) URL.revokeObjectURL(generated.url)
+    setOriginal(null)
+    setGenerated(null)
+    setResult(null)
+    setError(null)
+    setIsBusy(false)
+  }
+
   const play = (t: TransitionType) => {
     g.setTransition(t)
     g.next()
@@ -90,12 +100,17 @@ export default function App() {
           <h1 className="masthead__title">Panarama</h1>
           <p className="masthead__sub">תמונה · פרומפט · מעבר</p>
         </div>
-        <button
-          className="masthead__library-btn"
-          onClick={() => setShowLibrary(true)}
-        >
-          ספרייה
-        </button>
+        <div className="masthead__actions">
+          <button className="masthead__action-btn" onClick={newProject}>
+            + חדש
+          </button>
+          <button
+            className="masthead__action-btn"
+            onClick={() => setShowLibrary(true)}
+          >
+            ספרייה
+          </button>
+        </div>
       </header>
 
       {!SUPABASE_CONFIGURED && (
