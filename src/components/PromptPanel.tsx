@@ -40,11 +40,6 @@ export function PromptPanel({
     <section className="panel neu-raised">
       <div className="panel__head">
         <span className="panel__label">פרשנות</span>
-        {result && (
-          <button className="link-btn" onClick={copy} disabled={!result.prompt}>
-            {copied ? 'הועתק ✓' : 'העתקת פרומפט'}
-          </button>
-        )}
       </div>
 
       {error && <p className="panel__error">{error}</p>}
@@ -63,6 +58,13 @@ export function PromptPanel({
           <div className="panel__prompt">
             <span className="panel__label">פרומפט ל-Midjourney</span>
             <p dir="ltr" lang="en">{result.prompt}</p>
+            <button className="copy-btn" onClick={copy} disabled={!result.prompt}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+              {copied ? 'הועתק ✓' : 'העתקה ל-Midjourney'}
+            </button>
           </div>
         </>
       )}

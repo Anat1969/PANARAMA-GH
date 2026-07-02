@@ -334,6 +334,32 @@
   color: var(--c-accent);
   word-break: break-word;
 }
+.copy-btn {
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--c-bg);
+  box-shadow: var(--neu-sm);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: var(--c-accent);
+  transition: box-shadow 200ms var(--ease), transform 200ms var(--ease);
+}
+.copy-btn:hover {
+  transform: translateY(-1px);
+}
+.copy-btn:active {
+  box-shadow: var(--neu-inset-sm);
+  transform: translateY(0);
+}
+.copy-btn svg {
+  color: var(--c-muted);
+}
 .panel__placeholder {
   margin: 0;
   font-size: 14px;
