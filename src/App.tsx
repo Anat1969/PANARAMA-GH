@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react'
+import { AIMenu } from './components/AIMenu'
 import { ImageDrop } from './components/ImageDrop'
 import { ImageStage } from './components/ImageStage'
 import { ProjectLibrary } from './components/ProjectLibrary'
 import { PromptPanel } from './components/PromptPanel'
 import { SaveProjectButton } from './components/SaveProjectButton'
 import { TransitionPicker } from './components/TransitionPicker'
-import { UpgradeLink } from './components/UpgradeLink'
 import { imageFromUrl } from './data/images'
 import { useGallery, type TransitionType } from './hooks/useGallery'
 import { SUPABASE_CONFIGURED } from './lib/config'
@@ -101,15 +101,16 @@ export default function App() {
           <p className="masthead__sub">תמונה · פרומפט · מעבר</p>
         </div>
         <div className="masthead__actions">
-          <button className="masthead__action-btn" onClick={newProject}>
-            + חדש
-          </button>
           <button
             className="masthead__action-btn"
             onClick={() => setShowLibrary(true)}
           >
             ספרייה
           </button>
+          <AIMenu
+            chat="https://claude.ai/code/session_01KhDREyuGNSFuSVGSthsakq"
+            items={[{ label: 'פרויקט חדש', onSelect: newProject }]}
+          />
         </div>
       </header>
 
@@ -204,7 +205,6 @@ export default function App() {
         />
       )}
 
-      <UpgradeLink />
     </div>
   )
 }
