@@ -695,39 +695,6 @@
   font-size: 11px;
 }
 
-/* ============================================================
-   Upgrade link — fixed pill on the left edge
-   ============================================================ */
-.upgrade-link {
-  position: fixed;
-  bottom: 24px;
-  inset-inline-start: 18px;
-  z-index: 900;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--c-accent);
-  background: var(--c-bg);
-  text-decoration: none;
-  transition: box-shadow 200ms var(--ease), transform 200ms var(--ease);
-}
-.upgrade-link:hover {
-  transform: translateY(-1px);
-}
-.upgrade-link:active {
-  box-shadow: var(--neu-inset-sm);
-  transform: translateY(0);
-}
-.upgrade-link svg {
-  color: var(--c-muted);
-}
-
 /* ---- Library mobile ---- */
 @media (max-width: 640px) {
   .library-overlay {
